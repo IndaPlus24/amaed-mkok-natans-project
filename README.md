@@ -5,7 +5,12 @@ Allting ska ha ett namn.
 ## What are we making:
 A real-time top-down rouge-like dungeon crawler suitet for Drifvarkaden in META. 
 
+## Tools:
+  - Raylib (C++)
 ## MVP:
+- Aesthetic
+  - Palette
+  - Style
 - A map / level to play (preferably procedurally generated).
   - Walls
 - An avatar through which the player can interact with the world
@@ -13,12 +18,12 @@ A real-time top-down rouge-like dungeon crawler suitet for Drifvarkaden in META.
   - Take damage
   - Collide with obstacles
   - Move
-- Enemies that pose some challange to the player.
+- Enemies that pose some challenge to the player.
   - Cause damage
   - Take damage
   - Collide with obstacles
   - Move
-  - AI
+  (- AI)
 - A way to accumulate score to be saved and later shown. (Arcade games need scorebaord)
 - 2d graphics.
 
