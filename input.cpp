@@ -1,29 +1,69 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include <time.h>
-
 #include <raylib.h>
-#include <raymath.h>
+#include "input.h"
 
-typedef struct Inputs
-{
-    bool upDown;
-    bool downDown;
-    bool leftDown;
-    bool rightDown;
-    bool eDown;
-} Inputs;
+#ifdef DRIFVARKADEN
+// Drifvarkaden's button layout, for some reason
+KeyboardKey keys[] = {
+    KEY_UP,             // Up
+    KEY_DOWN,           // Down
+    KEY_LEFT,           // Left
+    KEY_RIGHT,          // Right
+    KEY_LEFT_ALT,       // (A)
+    KEY_LEFT_CONTROL,   // (B)
+    KEY_C,              // (C)
+    KEY_LEFT_SHIFT,     // (X)
+    KEY_SPACE,          // (Y)
+    KEY_Z,              // (Z)
+    KEY_H,              // START
+    KEY_Y               // SELECT
+};
+#else
+// A button layout I made up on the spot.
+KeyboardKey keys[] = {
+    KEY_W,        // Up
+    KEY_S,        // Down
+    KEY_A,        // Left
+    KEY_D,        // Right
+    KEY_J,        // (A)
+    KEY_K,        // (B)
+    KEY_L,        // (C)
+    KEY_U,        // (X)
+    KEY_I,        // (Y)
+    KEY_O,        // (Z)
+    KEY_ENTER,    // START
+    KEY_BACKSPACE // SELECT
+};
+#endif
 
 Inputs GetInputs()
 {
-    Inputs inputs = {0};
-    inputs.upDown = IsKeyDown(KEY_W);
-    inputs.downDown = IsKeyDown(KEY_S);
-    inputs.leftDown = IsKeyDown(KEY_A);
-    inputs.rightDown = IsKeyDown(KEY_D);
-    inputs.eDown = IsKeyPressed(KEY_E);
+       
+    Inputs inputs;
+
+    ButtonState inList[6];
+
+    for (int i = 0; i < 6; i++)
+    {
+        KeyboardKey key = keys[i];
+        if (IsKeyReleased(key))
+        {
+            inList[i] = ButtonState::Released;
+        }
+        else if (IsKeyUp(key))
+        {
+            inList[i] = ButtonState::Up;
+        }
+        else if (IsKeyPressed(key))
+        {
+            inList[i] = ButtonState::Pressed;
+        }
+        else
+        {
+            inList[i] = ButtonState::Down;
+        }
+    }
+
+    inputs = *((Inputs *)&inList);
+
     return inputs;
 }
-
