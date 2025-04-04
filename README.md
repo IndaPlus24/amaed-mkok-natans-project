@@ -33,7 +33,7 @@ A real-time top-down rouge-like dungeon crawler suitet for Drifvarkaden in META.
 - Shop
 
 ## Feasibility:
-It isn't hard to complete the **MVP** if we do not consider quality. However, if we take a look at **MVP +/++** then I can that quickly becoming unreasonable.
+It isn't hard to complete the **MVP** if we do not consider quality. However, if we take a look at **MVP +/++** then I can imagine it quickly becoming unreasonable.
 
 ## Division of work:
 Look at our [project](https://github.com/orgs/IndaPlus24/projects/5/views/1).
