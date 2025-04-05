@@ -23,6 +23,8 @@ typedef struct Inputs
     ButtonState x;
     ButtonState y;
     ButtonState z;
+    ButtonState start;
+    ButtonState select;
 
 } Inputs;
 

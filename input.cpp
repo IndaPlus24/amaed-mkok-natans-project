@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <raylib.h>
 #include "input.h"
 
@@ -52,14 +53,28 @@ KeyboardKey keys[] = {
 };
 #endif
 
+Inputs ArrayToInputs(ButtonState array[12]) {
+    Inputs inputs;
+    inputs.up = array[0];
+    inputs.down = array[1];
+    inputs.left = array[2];
+    inputs.right = array[3];
+    inputs.a = array[4];
+    inputs.b = array[5];
+    inputs.c = array[6];
+    inputs.x = array[7];
+    inputs.y = array[8];
+    inputs.z = array[9];
+    inputs.start = array[10];
+    inputs.select = array[11];
+    return inputs;
+}
+
 Inputs GetInputs()
 {
-       
-    Inputs inputs;
+    ButtonState inList[12];
 
-    ButtonState inList[6];
-
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 12; i++)
     {
         KeyboardKey key = keys[i];
         if (IsKeyReleased(key))
@@ -79,8 +94,6 @@ Inputs GetInputs()
             inList[i] = ButtonState::Down;
         }
     }
-
-    inputs = *((Inputs *)&inList);
-
-    return inputs;
+    
+    return ArrayToInputs(inList);
 }
