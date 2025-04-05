@@ -17,7 +17,24 @@ KeyboardKey keys[] = {
     KEY_H,              // START
     KEY_Y               // SELECT
 };
+
+// Drifvarkaden's player 2 button layout, for some reason
+KeyboardKey keysP2[] = {
+    KEY_R,              // Up
+    KEY_F,              // Down
+    KEY_D,              // Left
+    KEY_G,              // Right
+    KEY_S,              // (A)
+    KEY_A,              // (B)
+    KEY_O,              // (C)
+    KEY_Q,              // (X)
+    KEY_W,              // (Y)
+    KEY_I,              // (Z)
+    KEY_J,              // START
+    KEY_U               // SELECT
+};
 #else
+
 // A button layout I made up on the spot.
 KeyboardKey keys[] = {
     KEY_W,        // Up
