@@ -2,38 +2,42 @@
 #include <raylib.h>
 #include "input.h"
 
+// To change the keybinds, just def DRIFVARKADEN.
+// Might change how this works.
 #ifdef DRIFVARKADEN
 // Drifvarkaden's button layout, for some reason
 KeyboardKey keys[] = {
-    KEY_UP,             // Up
-    KEY_DOWN,           // Down
-    KEY_LEFT,           // Left
-    KEY_RIGHT,          // Right
-    KEY_LEFT_ALT,       // (A)
-    KEY_LEFT_CONTROL,   // (B)
-    KEY_C,              // (C)
-    KEY_LEFT_SHIFT,     // (X)
-    KEY_SPACE,          // (Y)
-    KEY_Z,              // (Z)
-    KEY_H,              // START
-    KEY_Y               // SELECT
+    KEY_UP,           // Up
+    KEY_DOWN,         // Down
+    KEY_LEFT,         // Left
+    KEY_RIGHT,        // Right
+    KEY_LEFT_ALT,     // (A)
+    KEY_LEFT_CONTROL, // (B)
+    KEY_C,            // (C)
+    KEY_LEFT_SHIFT,   // (X)
+    KEY_SPACE,        // (Y)
+    KEY_Z,            // (Z)
+    KEY_H,            // START
+    KEY_Y             // SELECT
 };
 
+#ifdef TWO_PLAYERS
 // Drifvarkaden's player 2 button layout, for some reason
 KeyboardKey keysP2[] = {
-    KEY_R,              // Up
-    KEY_F,              // Down
-    KEY_D,              // Left
-    KEY_G,              // Right
-    KEY_S,              // (A)
-    KEY_A,              // (B)
-    KEY_O,              // (C)
-    KEY_Q,              // (X)
-    KEY_W,              // (Y)
-    KEY_I,              // (Z)
-    KEY_J,              // START
-    KEY_U               // SELECT
+    KEY_R, // Up
+    KEY_F, // Down
+    KEY_D, // Left
+    KEY_G, // Right
+    KEY_S, // (A)
+    KEY_A, // (B)
+    KEY_O, // (C)
+    KEY_Q, // (X)
+    KEY_W, // (Y)
+    KEY_I, // (Z)
+    KEY_J, // START
+    KEY_U  // SELECT
 };
+#endif
 #else
 
 // A button layout I made up on the spot.
@@ -53,7 +57,11 @@ KeyboardKey keys[] = {
 };
 #endif
 
-Inputs ArrayToInputs(ButtonState array[12]) {
+/// @brief Turn the array of buttonStates into Inputs
+/// @param array The array (See the struct definition for the order)
+/// @return The buttonStates in Inputs format.
+Inputs ArrayToInputs(ButtonState array[12])
+{
     Inputs inputs;
     inputs.up = array[0];
     inputs.down = array[1];
@@ -72,6 +80,8 @@ Inputs ArrayToInputs(ButtonState array[12]) {
 
 Inputs GetInputs()
 {
+    // Some changes need to be made if we want to support two players.
+
     ButtonState inList[12];
 
     for (int i = 0; i < 12; i++)
@@ -94,6 +104,6 @@ Inputs GetInputs()
             inList[i] = ButtonState::Down;
         }
     }
-    
+
     return ArrayToInputs(inList);
 }

@@ -26,8 +26,8 @@ GameState RunGM()
     BeginDrawing();
     ClearBackground(BLACK);
 
-    DrawText("This has not been implemented yet, please quit.", 0,0,60, WHITE);
-    DrawText("(Press Escape)", 0,60,60, WHITE);
+    DrawText("This has not been implemented yet, please quit.", 0, 0, 60, WHITE);
+    DrawText("(Press Escape)", 0, 60, 60, WHITE);
 
     // Draw everything!
 

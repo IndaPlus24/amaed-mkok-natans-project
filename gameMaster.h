@@ -13,7 +13,7 @@ typedef struct
 /// @param initData The data which will be used as a base
 void InitGM(dataGM initData);
 
-/// @brief Run game logic.
+/// @brief Run game logic (aka GameMaster).
 /// @return The next game state to enter
 GameState RunGM();
 

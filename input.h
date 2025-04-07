@@ -1,12 +1,17 @@
 #ifndef H_INPUT
 #define H_INPUT
 
-// value & 1 == 1 <=> is down
-// value & 2 == 2 <=> state just changed
-enum class ButtonState {
+// value & 0b01 == 0b01 <=> is down
+// value & 0b10 == 0b10 <=> state just changed
+enum class ButtonState
+{
+    // 0b00
     Up = 0,
+    // 0b01
     Down = 1,
+    // 0b10
     Released = 2,
+    // 0b11
     Pressed = 3,
 };
 
@@ -25,10 +30,9 @@ typedef struct Inputs
     ButtonState z;
     ButtonState start;
     ButtonState select;
-
 } Inputs;
 
-
-// Get the inputs
+/// @brief Get the relevant inputs for the current frame
+/// @return The relevant inputs for the current fram
 Inputs GetInputs();
 #endif

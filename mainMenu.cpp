@@ -80,7 +80,8 @@ void navigateFuckedUpAndEvilMenuTree()
         break;
     // Options: change volume, back
     case 1:
-        if (selection == 0 && (inputs.right == ButtonState::Pressed || inputs.left == ButtonState::Pressed )) {
+        if (selection == 0 && (inputs.right == ButtonState::Pressed || inputs.left == ButtonState::Pressed))
+        {
             int change = (inputs.right == ButtonState::Pressed) - (inputs.left == ButtonState::Pressed);
             SetMasterVolume(GetMasterVolume() + change);
         }
