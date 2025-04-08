@@ -1,7 +1,7 @@
 #include <raylib.h>
 
-#include "gameMaster.h"
-#include "input.h"
+#include "include/gameMaster.h"
+#include "include/input.h"
 
 void InitGM(dataGM initdata)
 {
