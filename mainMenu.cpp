@@ -136,14 +136,14 @@ void drawFuckedUpAndEvilMenuTree()
     {
     case 0:
         options[0] = "Start";
-        options[1] = "Options";
-        options[2] = "Exit";
+        options[1] = "Inställningar";
+        options[2] = "Avsluta";
         amount = 3;
         break;
 
     case 1:
-        options[0] = TextFormat("- change volume %.f +", GetMasterVolume());
-        options[1] = "Back";
+        options[0] = TextFormat("- volym: %.f +", GetMasterVolume());
+        options[1] = "Tillbaka";
         amount = 2;
         break;
     }
