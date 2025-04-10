@@ -6,61 +6,9 @@
 
 #include <raylib.h>
 #include <raymath.h>
-#include "AI.cpp"
+#include "enemies.h"
 
-#define tileSize 32         // Size of the tile in pixels
-#define rayCount 16         // Number of rays to cast for line of sight
-#define DEG2RAD 0.017453292 // Conversion factor from degrees to radians
 
-typedef enum EnemyType
-{
-    ENEMY_NONE,
-    ENEMY_MELEE,
-    ENEMY_RANGED,
-} EnemyType;
-
-typedef enum EnemyBehavior
-{
-    BEHAVIOR_NONE,
-    BEHAVIOR_GUARD,
-    BEHAVIOR_FLANK,
-    BEHAVIOR_RUSH,
-    BEHAVIOR_RANGED,
-} EnemyBehavior;
-
-typedef struct Enemy
-{
-    EnemyType type;         // Type of enemy (melee, ranged, etc.)
-    EnemyBehavior behavior; // Behavior of the enemy (guard, flank, rush, ranged)
-    bool aware;             // Is the enemy aware of the player?
-    int health;
-    int damage;
-    int visionRange;           // Range of vision
-    float visionAngle;         // Angle of vision (in degrees)
-    int attackRange;           // Range of attack
-    int attackDamage;          // Damage dealt by the enemy
-    float attackCooldown;      // Cooldown time between attacks (measured in seconds)
-    float attackCooldownTimer; // Timer for attack cooldown (time since last attack, if greater than attackCooldown, the enemy can attack again)
-    float speed;
-    float acceleration; // Acceleration of the enemy
-    Vector2 velocity;   // Velocity of the enemy
-    Vector2 position;
-    Vector2 direction;
-    bool alive;
-} Enemy;
-typedef struct Enemies
-{
-    Enemy *enemies; // Array of enemies
-    int count;      // Number of enemies
-} Enemies;
-
-typedef struct EnemySeeder
-{
-    Vector2* positions;      // Array of enemy positions
-    int count;                // Number of enemies
-    EnemyType* type;         // Array of type of enemy (melee, ranged, etc.)
-    EnemyBehavior* behavior; // Array of behavior of the enemy (guard, flank, rush, ranged)
-} EnemySeeder;
 
 void EnemyMovement(Enemy *enemy, Vector2 target)
 {
@@ -204,7 +152,7 @@ Enemies CreateEnemies(EnemySeeder *seeder)
         enemies.enemies[i].alive = true;                    // Set the enemy as alive
         switch (seeder->type[i])
         {
-        case MELEE:
+        case ENEMY_MELEE:
             enemies.enemies[i].type = ENEMY_MELEE;
             enemies.enemies[i].attackRange = 0.5f * tileSize; // .5 tile
             enemies.enemies[i].attackDamage = 10;
@@ -212,7 +160,7 @@ Enemies CreateEnemies(EnemySeeder *seeder)
             enemies.enemies[i].attackCooldownTimer = 0.0f;
             enemies.enemies[i].acceleration = 0.8f; // Acceleration of the enemy
             break;
-        case RANGED:
+        case ENEMY_RANGED:
             enemies.enemies[i].type = ENEMY_RANGED;
             enemies.enemies[i].attackRange = 10 * tileSize; // 10 tiles
             enemies.enemies[i].attackDamage = 8;
