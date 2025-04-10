@@ -7,24 +7,24 @@
 #include <raylib.h>
 #include <raymath.h>
 
-#define tileSize 32           // Size of the tile in pixels
-#define rayCount 16           // Number of rays to cast for line of sight
-#define DEG2RAD = 0.017453292 // Conversion factor from degrees to radians
+#define tileSize 32         // Size of the tile in pixels
+#define rayCount 16         // Number of rays to cast for line of sight
+#define DEG2RAD 0.017453292 // Conversion factor from degrees to radians
 
 typedef enum EnemyType
 {
-    NULL,
-    MELEE,
-    RANGED,
+    ENEMY_NONE,
+    ENEMY_MELEE,
+    ENEMY_RANGED,
 } EnemyType;
 
 typedef enum EnemyBehavior
 {
-    NULL,
-    GUARD,
-    FLANK,
-    RUSH,
-    RANGED,
+    BEHAVIOR_NONE,
+    BEHAVIOR_GUARD,
+    BEHAVIOR_FLANK,
+    BEHAVIOR_RUSH,
+    BEHAVIOR_RANGED,
 } EnemyBehavior;
 
 typedef struct Enemy
@@ -55,10 +55,10 @@ typedef struct Enemies
 
 typedef struct EnemySeeder
 {
-    Vector2[] positions;      // Array of enemy positions
+    Vector2* positions;      // Array of enemy positions
     int count;                // Number of enemies
-    EnemyType[] type;         // Array of type of enemy (melee, ranged, etc.)
-    EnemyBehavior[] behavior; // Array of behavior of the enemy (guard, flank, rush, ranged)
+    EnemyType* type;         // Array of type of enemy (melee, ranged, etc.)
+    EnemyBehavior* behavior; // Array of behavior of the enemy (guard, flank, rush, ranged)
 } EnemySeeder;
 
 void EnemyMovement(Enemy *enemy, Vector2 target)
@@ -91,11 +91,11 @@ void EnemyAttack(Enemy *enemy, Player *player)
 {
     // Check if the enemy is within attack range of the target
     float distance = Vector2Distance(enemy->position, player->position);
-    if (distance <= enemy->attackRange)
+    if (distance <= enemy->attackRange && enemy->attackCooldownTimer >= enemy->attackCooldown)
     {
         // Attack logic here
         player->health -= enemy->damage;
-        enemy->attackCooldown = 1.0f; // Reset cooldown after attack
+        enemy->attackCooldownTimer = 0.0f; // Reset cooldown after attack
     }
 }
 bool EnemyLineOfSight(Enemy *enemy, Player *player, Tile *tileMap)
@@ -105,7 +105,7 @@ bool EnemyLineOfSight(Enemy *enemy, Player *player, Tile *tileMap)
     float distance = Vector2Distance(enemy->position, player->position);
     bool canSee = false;
     Vector2 ray = enemy->position;
-    for (int j = -rayCount; j < rayCount / 2; j++)
+    for (int j = -rayCount; j <= rayCount / 2; j++)
     {
         // Calculate the angle offset for the ray based on the enemy's vision angle
         float angleOffset = ((float)j / (rayCount - 1) - 0.5f) * enemy->visionAngle * DEG2RAD;
@@ -117,8 +117,9 @@ bool EnemyLineOfSight(Enemy *enemy, Player *player, Tile *tileMap)
         for (int i = 0; i < enemy->visionRange; i++)
         {
             // take a step in the direction of the ray
-            ray.x += cosf(angle) * i * tileSize;
-            ray.y += sinf(angle) * i * tileSize;
+            ray.x += cosf(angle) * tileSize;
+            ray.y += sinf(angle) * tileSize;
+
             // check if the ray is within the vision range of the enemy
             if (ray.x < 0 || ray.x > GetScreenWidth() || ray.y < 0 || ray.y > GetScreenHeight())
             {
@@ -129,7 +130,7 @@ bool EnemyLineOfSight(Enemy *enemy, Player *player, Tile *tileMap)
             int rayGridX = (int)(ray.x / tileSize);
             int rayGridY = (int)(ray.y / tileSize);
 
-            if (!tileMap[gridX][gridY].walkable)
+            if (!tileMap[rayGridX][rayGridY].walkable)
             {
                 break; // Ray hit an obstacle.
             }
@@ -164,7 +165,8 @@ void EnemyUpdate(Enemy *enemy, Player *player, Tile *tileMap)
         // TODO : Implement more advanced AI for enemy movement
         // - four types of enemy pathing, ranged (Tries to stay at a good range to hit the player), flanking (tries to cut off the player), guard (guards their target, for example a ranged unit), rush (Just charges at the player which is basically the current behavior but pathfinding is not implemented yet)
 
-        EnemyMovement(enemy, player.position);
+        EnemyMovement(enemy, player->position);
+        enemy->attackCooldownTimer += GetFrameTime(); // Update the attack cooldown timer
 
         // Check if the enemy is aware of the player
         if (enemy->aware == false)
@@ -188,32 +190,32 @@ Enemies CreateEnemies(EnemySeeder *seeder)
     enemies.count = seeder->count;                                    // Set the number of enemies
     enemies.enemies = (Enemy *)malloc(sizeof(Enemy) * enemies.count); // Allocate memory for the enemies array
     for (int i = 0; i < enemies.count; i++)
-    {   
+    {
         enemies.enemies[i].behavior = seeder->behavior[i];
         enemies.enemies[i].health = 100;
         enemies.enemies[i].damage = 15;
         enemies.enemies[i].visionRange = 25 * tileSize; // 5 tiles
-        enemies.enemies[i].visionAngle = 90.0f;        // 90 degrees
+        enemies.enemies[i].visionAngle = 90.0f;         // 90 degrees
         enemies.enemies[i].speed = 2.0f;
         enemies.enemies[i].position = seeder->positions[i]; // Set the position of the enemy
         enemies.enemies[i].alive = true;                    // Set the enemy as alive
         switch (seeder->type[i])
         {
         case MELEE:
-            enemies.enemies[i].type = MELEE;
-            enemies.enemies[i].attackRange = 0.5f * tileSize; // 1 tile
+            enemies.enemies[i].type = ENEMY_MELEE;
+            enemies.enemies[i].attackRange = 0.5f * tileSize; // .5 tile
             enemies.enemies[i].attackDamage = 10;
             enemies.enemies[i].attackCooldown = 0.3f; // .3 second cooldown
             enemies.enemies[i].attackCooldownTimer = 0.0f;
-            enemies.enemies[i].acceleration = 0.8f;             // Acceleration of the enemy
+            enemies.enemies[i].acceleration = 0.8f; // Acceleration of the enemy
             break;
         case RANGED:
-            enemies.enemies[i].type = MELEE;
-            enemies.enemies[i].attackRange = 10 * tileSize; // 1 tile
+            enemies.enemies[i].type = ENEMY_RANGED;
+            enemies.enemies[i].attackRange = 10 * tileSize; // 10 tiles
             enemies.enemies[i].attackDamage = 8;
             enemies.enemies[i].attackCooldown = 0.8f; // .8 second cooldown
             enemies.enemies[i].attackCooldownTimer = 0.0f;
-            enemies.enemies[i].acceleration = 1.0f;             // Acceleration of the enemy
+            enemies.enemies[i].acceleration = 1.0f; // Acceleration of the enemy
             break;
         default:
             break;
