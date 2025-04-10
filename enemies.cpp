@@ -6,6 +6,7 @@
 
 #include <raylib.h>
 #include <raymath.h>
+#include "AI.cpp"
 
 #define tileSize 32         // Size of the tile in pixels
 #define rayCount 16         // Number of rays to cast for line of sight
@@ -165,7 +166,9 @@ void EnemyUpdate(Enemy *enemy, Player *player, Tile *tileMap)
         // TODO : Implement more advanced AI for enemy movement
         // - four types of enemy pathing, ranged (Tries to stay at a good range to hit the player), flanking (tries to cut off the player), guard (guards their target, for example a ranged unit), rush (Just charges at the player which is basically the current behavior but pathfinding is not implemented yet)
 
-        EnemyMovement(enemy, player->position);
+        // - enemy pathfinding (A* or Dijkstra's algorithm) to find the best path to the player
+        Vector2 target = GetFlowFieldDirection((int)(enemy->position.x / tileSize), (int)(enemy->position.y / tileSize)); // Get the flow field direction for the enemy
+        EnemyMovement(enemy, target);
         enemy->attackCooldownTimer += GetFrameTime(); // Update the attack cooldown timer
 
         // Check if the enemy is aware of the player

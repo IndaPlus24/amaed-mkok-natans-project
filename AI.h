@@ -21,4 +21,4 @@ void ComputeFlowField(int playerGridX, int playerGridY);
 // Get the normalized direction for an enemy located at (gridX, gridY) based on the flow field.
 Vector2 GetFlowFieldDirection(int gridX, int gridY);
 
-#endif // AI_H
+#endif 
