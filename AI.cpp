@@ -74,7 +74,7 @@ void ComputeFlowField(int playerGridX, int playerGridY)
 
 // Return the normalized direction vector for an enemy at grid coordinates (gridX, gridY)
 // by finding the neighbor cell with the lowest cost.
-Vector2 GetFlowFieldDirection(int gridX, int gridY)
+Vector2 GetFlowFieldDirection(int gridX, int gridY,)
 {
 
     float bestCost = grid[gridX][gridY].cost;
