@@ -107,7 +107,7 @@ bool EnemyLineOfSight(Enemy *enemy, Player *player, Tile *tileMap)
 
 void EnemyUpdate(Enemy *enemy, Player *player, Tile *tileMap)
 {
-    if (enemy->alive)
+    if (enemy->alive && enemy->stunTimer <= 0.0f)
     {
         // Move the enemy towards the target (player)
         // EnemyMovement target is the player position currently but will probably be changed in the future to allow for more advanced AI
@@ -132,6 +132,10 @@ void EnemyUpdate(Enemy *enemy, Player *player, Tile *tileMap)
                 EnemyAttack(enemy, player);
             }
         }
+    }
+    else if( enemy->stunTimer > 0.0f)
+    {
+        enemy->stunTimer -= GetFrameTime(); // Update the stun timer
     }
 }
 

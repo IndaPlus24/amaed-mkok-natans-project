@@ -56,6 +56,7 @@ typedef struct Enemy
     Vector2 position;       // Current position
     Vector2 direction;      // Current facing direction
     bool alive;
+    float stunTimer;  // Timer for stun duration
 } Enemy;
 
 // Container for an array of enemies.
