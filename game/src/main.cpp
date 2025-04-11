@@ -7,8 +7,8 @@
 #include <raylib.h>
 #include <raymath.h>
 
-#include "include/mainMenu.h"
-#include "include/gameMaster.h"
+#include "mainMenu.h"
+#include "gameMaster.h"
 
 void InitDisplay()
 {
