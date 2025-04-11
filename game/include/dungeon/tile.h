@@ -9,6 +9,6 @@ struct Tile
     bool isWalkable;
     bool isDoor;
     bool isWall;
-}
+};
 
 #endif
