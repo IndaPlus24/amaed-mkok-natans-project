@@ -1,0 +1,1 @@
+This file exists so that you will get the bin directory, will be included even though it is empty, because I can not be bothered to figure out how to get the Makefile to create this directory on its own.

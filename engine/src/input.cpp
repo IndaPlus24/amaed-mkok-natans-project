@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <raylib.h>
-#include "include/input.h"
+#include "input.h"
 
 // To change the keybinds, just def DRIFVARKADEN.
 // Might change how this works.

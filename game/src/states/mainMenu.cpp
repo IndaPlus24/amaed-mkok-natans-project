@@ -3,9 +3,9 @@
 #include <string.h>
 #include <raylib.h>
 
-#include "include/mainMenu.h"
-#include "include/gameMaster.h"
-#include "include/input.h"
+#include "mainMenu.h"
+#include "gameMaster.h"
+#include "input.h"
 
 int selection;
 unsigned menuId;
