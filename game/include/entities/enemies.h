@@ -5,15 +5,14 @@
 #include <raylib.h>
 #include <raymath.h>
 #include "AI.h"  
+#include "playerStruct.h"
+#include "map.h"
 
 // -- Macro Definitions --
-#define tileSize 32         // Size of a tile in pixels
 #define rayCount 16         // Number of rays to cast for line of sight
-#define DEG2RAD 0.017453292 // Conversion factor from degrees to radians
 
 // -- Forward Declarations --
 // These should be defined elsewhere.
-typedef struct Player Player;
 typedef struct Tile Tile;
 
 // -- Type Definitions --
@@ -78,8 +77,9 @@ typedef struct EnemySeeder
 // -- Function Prototypes --
 void EnemyMovement(Enemy *enemy, Vector2 target);
 void EnemyAttack(Enemy *enemy, Player *player);
-bool EnemyLineOfSight(Enemy *enemy, Player *player, Tile *tileMap);
-void EnemyUpdate(Enemy *enemy, Player *player, Tile *tileMap);
+bool EnemyLineOfSight(Enemy *enemy, Player *player, Room *room);
+void EnemyUpdate(Enemy *enemy, Player *player, Room *room);
+void EnemyDraw(Enemy *enemy);
 Enemies CreateEnemies(EnemySeeder *seeder);
 
 #endif // ENEMIES_H

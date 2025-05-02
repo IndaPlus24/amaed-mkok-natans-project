@@ -48,13 +48,11 @@ void EnemyAttack(Enemy *enemy, Player *player)
         enemy->attackCooldownTimer = 0.0f; // Reset cooldown after attack
     }
 }
-bool EnemyLineOfSight(Enemy *enemy, Player *player, Tile *tileMap)
+bool EnemyLineOfSight(Enemy *enemy, Player *player, Room *room)
 {
     // Check if the enemy has line of sight to the player
     // This is a simple implementation, you might want to use raycasting or other methods for more complex scenarios
-    float distance = Vector2Distance(enemy->position, player->position);
     bool canSee = false;
-    Vector2 ray = enemy->position;
     for (int j = -rayCount; j <= rayCount / 2; j++)
     {
         // Calculate the angle offset for the ray based on the enemy's vision angle
@@ -80,7 +78,7 @@ bool EnemyLineOfSight(Enemy *enemy, Player *player, Tile *tileMap)
             int rayGridX = (int)(ray.x / tileSize);
             int rayGridY = (int)(ray.y / tileSize);
 
-            if (!tileMap[rayGridX][rayGridY].walkable)
+            if (!GetTile(room, rayGridX, rayGridY).isWalkable)
             {
                 break; // Ray hit an obstacle.
             }
@@ -106,7 +104,7 @@ bool EnemyLineOfSight(Enemy *enemy, Player *player, Tile *tileMap)
     return canSee; // Return true if the enemy can see the player, false otherwise.
 }
 
-void EnemyUpdate(Enemy *enemy, Player *player, Tile *tileMap)
+void EnemyUpdate(Enemy *enemy, Player *player, Room *room)
 {
     if (enemy->alive && enemy->stunTimer <= 0.0f)
     {
@@ -123,7 +121,7 @@ void EnemyUpdate(Enemy *enemy, Player *player, Tile *tileMap)
         // Check if the enemy is aware of the player
         if (enemy->aware == false)
         {
-            EnemyLineOfSight(enemy, player, tileMap); // Check if the enemy can see the player
+            EnemyLineOfSight(enemy, player, room); // Check if the enemy can see the player
         }
         if (enemy->aware == true) // two if statments on both values of aware is intended and not a mistake
         {

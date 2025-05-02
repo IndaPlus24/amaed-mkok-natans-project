@@ -43,7 +43,11 @@ int main()
             gameState = RunGM();
         }
         break;
-
+        case GameState::GameOver:
+        {
+            // idk - Natan
+        }
+        break;
         case GameState::Break:
             CloseWindow();
             return 0;
