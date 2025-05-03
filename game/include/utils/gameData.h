@@ -2,13 +2,15 @@
 #define GAME_DATA_H
 
 #include "playerStruct.h"
-#include "enemies.h"
+#include "enemiesStruct.h"
+#include "projectilesStruct.h"
 #include "map.h"
 
 typedef struct GameData {
     Player player;
     Enemies enemies;
-    Room currentRoom;
+    Projectiles projectiles;
+    Room *currentRoom;
     Map map;
 } GameData;
 

@@ -7,7 +7,7 @@
 #include <raylib.h>
 #include <raymath.h>
 
-#include "enemies.h"
+#include "gameData.h"
 
 
 
@@ -104,8 +104,11 @@ bool EnemyLineOfSight(Enemy *enemy, Player *player, Room *room)
     return canSee; // Return true if the enemy can see the player, false otherwise.
 }
 
-void EnemyUpdate(Enemy *enemy, Player *player, Room *room)
+void EnemyUpdate(Enemy *enemy, GameData *gameData)
 {
+    Player *player = &gameData->player;
+    Room *room = gameData->currentRoom;
+    
     if (enemy->alive && enemy->stunTimer <= 0.0f)
     {
         // Move the enemy towards the target (player)
@@ -152,7 +155,9 @@ Enemies CreateEnemies(EnemySeeder *seeder)
         enemies.enemies[i].visionAngle = 90.0f;         // 90 degrees
         enemies.enemies[i].speed = 2.0f;
         enemies.enemies[i].position = seeder->positions[i]; // Set the position of the enemy
-        enemies.enemies[i].alive = true;                    // Set the enemy as alive
+        enemies.enemies[i].alive = true;                    // Set the enemy as 
+        enemies.enemies[i].width = 16;
+        enemies.enemies[i].height = 16;
         switch (seeder->type[i])
         {
         case ENEMY_MELEE:
@@ -177,4 +182,21 @@ Enemies CreateEnemies(EnemySeeder *seeder)
     }
 
     return enemies;
+}
+
+void EnemyDraw(Enemy *enemy) {
+    switch (enemy->type)
+    {
+    case ENEMY_MELEE:
+        DrawRectangle((int)(enemy->position.x - ((enemy->width + 1) >> 1)), (int)(enemy->position.y - ((enemy->height + 1) >> 1)), (int)enemy->width, (int)enemy->height, RED);
+        break;
+    
+    case ENEMY_RANGED:
+        DrawRectangle((int)(enemy->position.x - ((enemy->width + 1) >> 1)), (int)(enemy->position.y - ((enemy->height + 1) >> 1)), (int)enemy->width, (int)enemy->height, YELLOW);
+        break;
+    
+    default:
+        DrawText("ERROR", (int)enemy->position.x, (int)enemy->position.y, 20, RED);
+        break;
+    }
 }

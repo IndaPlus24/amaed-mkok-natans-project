@@ -6,17 +6,20 @@
 #include "playerFunks.h"
 
 GameData gameData;
+Room a;
 
 void InitGM(dataGM initdata)
 {
     // Initiate floor, room, enemies, player, and so on.
-    gameData.player = CreatePlayer();
-    gameData.player.position = Vector2{(float)(tileSize * 4), (float)(tileSize * 4)};
-    
+    gameData.player = CreatePlayer(Vector2{(float)(tileSize * 4), (float)(tileSize * 4)});
+
     gameData.player.sheets[0] = LoadSpriteSheet("assets/sprites/n0llan.png", 8, 1);
 
-    gameData.currentRoom = CreateRoom(0, 20, 20);
+    a = CreateRoom(0, 20, 20);
+    gameData.currentRoom = &a;
 
+    BeginDrawing();
+    EndDrawing();
 }
 
 GameState RunGM()
@@ -37,7 +40,7 @@ GameState RunGM()
     BeginDrawing();
     ClearBackground(BLACK);
 
-    RoomDraw(&gameData.currentRoom);
+    RoomDraw(gameData.currentRoom);
     PlayerDraw(&gameData.player);
 
     DrawText("Test Room", 0, 0, 20, WHITE);

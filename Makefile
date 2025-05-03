@@ -9,7 +9,7 @@ C_ARGS = -Igame/include/ -Igame/include/states/ -Igame/include/entities -Igame/i
 # The directory for *.o files
 O_DIR = bin/
 
-MAIN_SRC = $(O_DIR)main.o $(O_DIR)mainMenu.o $(O_DIR)gameMaster.o $(O_DIR)input.o $(O_DIR)AI.o $(O_DIR)enemies.o $(O_DIR)player.o $(O_DIR)map.o ${O_DIR}entities.o ${O_DIR}spriteSheet.o
+MAIN_SRC = $(O_DIR)main.o $(O_DIR)mainMenu.o $(O_DIR)gameMaster.o $(O_DIR)input.o $(O_DIR)AI.o $(O_DIR)enemies.o $(O_DIR)player.o $(O_DIR)map.o ${O_DIR}entities.o ${O_DIR}spriteSheet.o ${O_DIR}attack.o
 
 default: main
 
@@ -22,7 +22,7 @@ $(O_DIR)main.o: game/src/main.cpp game/include/states/mainMenu.h game/include/st
 $(O_DIR)mainMenu.o: game/src/states/mainMenu.cpp game/include/states/mainMenu.h game/include/states/gameMaster.h engine/include/input.h
 	$(LD) $(C_ARGS) -c -o $(O_DIR)mainMenu.o game/src/states/mainMenu.cpp
 
-$(O_DIR)gameMaster.o: game/src/states/gameMaster.cpp game/include/states/gameMaster.h engine/include/input.h game/include/utils/gameData.h engine/include/graphics/spriteSheet.h
+$(O_DIR)gameMaster.o: game/src/states/gameMaster.cpp game/include/states/gameMaster.h engine/include/input.h game/include/utils/gameData.h engine/include/graphics/spriteSheet.h game/include/entities/playerFunks.h
 	$(LD) $(C_ARGS) -c -o $(O_DIR)gameMaster.o game/src/states/gameMaster.cpp
 
 $(O_DIR)input.o: engine/src/input.cpp engine/include/input.h
@@ -34,10 +34,10 @@ $(O_DIR)AI.o: game/src/entities/AI.cpp game/include/entities/AI.h
 ${O_DIR}map.o: game/src/dungeon/map.cpp game/include/dungeon/map.h
 	$(LD) $(C_ARGS) -c -o $(O_DIR)map.o game/src/dungeon/map.cpp
 
-${O_DIR}player.o: game/src/entities/player.cpp game/include/entities/playerFunks.h game/include/entities/entityFunks.h
+${O_DIR}player.o: game/src/entities/player.cpp game/include/entities/playerFunks.h game/include/entities/entityFunks.h game/include/entities/attackFunks.h
 	$(LD) $(C_ARGS) -c -o $(O_DIR)player.o game/src/entities/player.cpp
 
-${O_DIR}enemies.o: game/src/entities/enemies.cpp game/include/entities/enemies.h game/include/entities/AI.h
+${O_DIR}enemies.o: game/src/entities/enemies.cpp game/include/entities/enemiesFunks.h game/include/entities/AI.h
 	$(LD) $(C_ARGS) -c -o $(O_DIR)enemies.o game/src/entities/enemies.cpp
 
 ${O_DIR}entities.o: game/src/entities/entities.cpp game/include/entities/entityFunks.h
@@ -46,15 +46,20 @@ ${O_DIR}entities.o: game/src/entities/entities.cpp game/include/entities/entityF
 ${O_DIR}spriteSheet.o: engine/src/graphics/spriteSheet.cpp engine/include/graphics/spriteSheet.h
 	$(LD) $(C_ARGS) -c -o $(O_DIR)spriteSheet.o engine/src/graphics/spriteSheet.cpp
 
+${O_DIR}attack.o: game/src/entities/attack.cpp game/include/entities/attackFunks.h
+	$(LD) $(C_ARGS) -c -o $(O_DIR)attack.o game/src/entities/attack.cpp
+
 
 game/include/states/gameMaster.h: game/include/states/gameState.h
 game/include/states/mainMenu.h: game/include/states/gameState.h
-game/include/entities/enemies.h: game/include/entities/AI.h game/include/entities/playerStruct.h game/include/dungeon/map.h
+game/include/entities/enemiesStruct.h: game/include/entities/AI.h game/include/dungeon/map.h
 game/include/dungeon/map.h: game/include/dungeon/tile.h
-game/include/utils/gameData.h: game/include/entities/playerStruct.h game/include/entities/enemies.h game/include/dungeon/map.h
+game/include/utils/gameData.h: game/include/entities/playerStruct.h game/include/entities/enemiesStruct.h game/include/entities/projectilesStruct.h game/include/dungeon/map.h
 game/include/entities/playerFunks.h: engine/include/input.h game/include/utils/gameData.h
 game/include/entities/playerStruct.h: engine/include/graphics/spriteSheet.h
 game/include/entities/entityFunks.h: game/include/utils/gameData.h
+game/include/entities/enemiesFunks: game/include/utils/gameData.h
+game/include/entities/attackFunks.h: game/include/utils/gameData.h game/include/entities/attackStruct.h
 
 clear:
 	rm $(O_DIR)*.o

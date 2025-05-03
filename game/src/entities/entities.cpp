@@ -22,7 +22,7 @@ bool EntityMove(Vector2 *pos, Vector2 move, int width, int height, GameData *gam
         {
             for (int y = y0; y <= y1; y++)
             {
-                if (!GetTile(&gameData->currentRoom, x, y).isWalkable)
+                if (!GetTile(gameData->currentRoom, x, y).isWalkable)
                 {
                     stopX = true;
                     break;
@@ -62,7 +62,7 @@ bool EntityMove(Vector2 *pos, Vector2 move, int width, int height, GameData *gam
         {
             for (int x = x0; x <= x1; x++)
             {
-                if (!GetTile(&gameData->currentRoom, x, y).isWalkable)
+                if (!GetTile(gameData->currentRoom, x, y).isWalkable)
                 {
                     stopY = true;
                 }
