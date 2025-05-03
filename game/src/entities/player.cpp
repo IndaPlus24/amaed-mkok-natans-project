@@ -1,4 +1,5 @@
 #include "playerFunks.h"
+#include "entityFunks.h"
 
 Player CreatePlayer()
 {
@@ -45,90 +46,6 @@ void PlayerNeutral(Player *player, GameData *gameData, Inputs *inputs)
     player->velocity = Vector2Scale(inputDir, player->speed);
 }
 
-void PlayerMove(Player *player, GameData *gameData)
-{
-    Vector2 move = Vector2Scale(player->velocity, GetFrameTime());
-
-    // Horizontal
-    if (move.x != 0)
-    {
-        int sign = move.x > 0 ? 1 : -1;
-        float margin = sign * player->width / 2;
-
-        int y0 = (int)((player->position.y - player->height / 2) / tileSize);     // y start
-        int y1 = (int)((player->position.y + player->height / 2 - 1) / tileSize); // y end
-        int x0 = (int)((player->position.x) / tileSize);                          // x start
-        int x1 = (int)((player->position.x + move.x + margin) / tileSize);        // x limit
-
-        // Did it hit a wall?
-        bool stop = false;
-
-        // loop from x0 to x1 (inclusive)
-        for (int x = x0; x != x1 + sign; x += sign)
-        {
-            for (int y = y0; y <= y1; y++)
-            {
-                if (!GetTile(&gameData->currentRoom, x, y).isWalkable)
-                {
-                    stop = true;
-                    break;
-                }
-            }
-            if (stop)
-            {
-                int lastTile = x - sign; // The x of the tile they would have ended up in
-
-                player->position.x = (lastTile + (sign + 1) / 2) * tileSize - margin;
-                break;
-            }
-        }
-
-        if (!stop)
-        {
-            player->position.x += move.x;
-        }
-    }
-
-    // Vertical
-    if (move.y != 0)
-    {
-        int sign = move.y > 0 ? 1 : -1;
-        float margin = sign * player->width / 2;
-
-        int y0 = (int)((player->position.y) / tileSize);                         // y start
-        int y1 = (int)((player->position.y + move.y + margin) / tileSize);       // y limit
-        int x0 = (int)((player->position.x - player->width / 2) / tileSize);     // x start
-        int x1 = (int)((player->position.x + player->width / 2 - 1) / tileSize); // x end
-
-        // Did it hit a wall?
-        bool stop = false;
-
-        // loop from y0 to y1 (inclusive)
-        for (int y = y0; y != y1 + sign; y += sign)
-        {
-            for (int x = x0; x <= x1; x++)
-            {
-                if (!GetTile(&gameData->currentRoom, x, y).isWalkable)
-                {
-                    stop = true;
-                }
-            }
-            if (stop)
-            {
-                int lastTile = y - sign; // The y of the tile they would have ended up in
-
-                player->position.y = (lastTile + (sign + 1) / 2) * tileSize - margin;
-                break;
-            }
-        }
-
-        if (!stop)
-        {
-            player->position.y += move.y;
-        }
-    }
-}
-
 void PlayerUpdate(GameData *gameData, Inputs *inputs)
 {
     Player *player = &gameData->player;
@@ -143,7 +60,8 @@ void PlayerUpdate(GameData *gameData, Inputs *inputs)
         break;
     }
 
-    PlayerMove(player, gameData);
+    Vector2 move = Vector2Scale(player->velocity, GetFrameTime());
+    EntityMove(&player->position, move, player->width, player->height, gameData);
 }
 
 void PlayerDraw(Player *player)

@@ -20,8 +20,8 @@ typedef struct Player
     Vector2 velocity;       // Current velocity
     Vector2 position;       // Current position
     Vector2 direction;      // Current facing direction
-    float width;            // Collision width
-    float height;           // Collision height
+    int width;              // Collision width
+    int height;             // Collision height
 
 } Player;
 
