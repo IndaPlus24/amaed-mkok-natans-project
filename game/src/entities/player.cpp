@@ -10,6 +10,8 @@
 #include "player.h"
 #include "enemies.h"
 #include "input.h"
+#include "playerFunks.h"
+#include "entityFunks.h"
 
 void PlayerMovement(Player *p, const Inputs *in)
 {
@@ -35,14 +37,9 @@ void PlayerMovement(Player *p, const Inputs *in)
     dir = Vector2Normalize(dir);
     p->direction = dir;
 
-    p->velocity = Vector2Add(p->velocity,
-                             Vector2Scale(dir, p->acceleration * GetFrameTime()));
+    p->velocity = Vector2Add(p->velocity, Vector2Scale(dir, p->acceleration * GetFrameTime()));
 
-    if (Vector2Length(p->velocity) > p->speed)
-        p->velocity = Vector2Scale(Vector2Normalize(p->velocity), p->speed);
-
-    p->position = Vector2Add(p->position,
-                             Vector2Scale(p->velocity, GetFrameTime()));
+    if (Vector2Length(p->velocity) > p->speed) p->velocity = Vector2Scale(Vector2Normalize(p->velocity), p->speed);
 }
 void PlayerAttack(Player *p, Enemies *enemies, const Inputs *in)
 {
@@ -83,8 +80,11 @@ void PlayerAttack(Player *p, Enemies *enemies, const Inputs *in)
     p->attackCooldownTimer = 0.0f;
 }
 
-void PlayerUpdate(Player *p,ProjectilePool *pool,Enemies *enemies,const Inputs *in)
+void PlayerUpdate(GameData *gameData,const Inputs *in)
 {
+    Player *player = &gameData->player;
+    Enemies *enemies = &gameData->enemies;
+    Projectiles *projectiles = &gameData->projectiles;
     if (!p->alive)
         return;
 
@@ -93,29 +93,70 @@ void PlayerUpdate(Player *p,ProjectilePool *pool,Enemies *enemies,const Inputs *
         p->stunTimer -= GetFrameTime();
         return;
     }
+      
+    Player *player = &gameData->player;
 
-    PlayerMovement(p, in);
+    switch (player->state)
+    {
+    case PlayerState::Neutral:
+        PlayerMovement(player, in);
+        break;
 
+    default:
+        break;
+    }
+
+    Vector2 move = Vector2Scale(player->velocity, GetFrameTime());
+    EntityMove(&player->position, move, player->width, player->height, gameData);
+    
     p->attackCooldownTimer += GetFrameTime();
     PlayerAttack(p, pool, enemies, in); /* pass enemies along */
 }
+  
+  void PlayerDraw(Player *player)
+{
+    DrawRectangle((int)(player->position.x - ((player->width + 1) >> 1)), (int)(player->position.y - ((player->height + 1) >> 1)), (int)player->width, (int)player->height, GREEN);
+
+    // A "simple" "algoritm" to translate a vector into an integer representing its angle (clockwise is positive, (0,1) is 0)
+    int dir = 0;
+    if (player->direction.x != 0)
+    {
+        int a = player->direction.x > 0 ? -1 : 1;
+        int b = 1;
+        if (player->direction.y == 0)
+        {
+            b = 2;
+        }
+        else if (player->direction.y < 0)
+        {
+            b = 3;
+        }
+        dir = (8 + a * b) % 8;
+    }
+    else if (player->direction.y < 0)
+    {
+        dir = 4;
+    }
+    DrawCentre(&player->sheets[0], dir, 0, player->position);
 
 // THIS FUNCTION WAS CREATED BY COPILOT, I DID NOT WRITE IT, IT IS ONLY HERE FOR TESTING PURPOSES
 // TODO : MAKE SURE THIS FUNCTION IS WRITTEN BY A HUMAN.
-Player CreatePlayer(Vector2 spawnPos, PlayerType type){ 
-    Player p = {0};
-    p.position = spawnPos;
-    p.type = type;
-    p.speed = 200.0f;
-    p.acceleration = 1000.0f;
-    p.health = 100.0f;
-    p.attackRange = 50.0f;
-    p.attackDamage = 10.0f;
-    p.attackCooldown = 1.0f;
-    p.attackCooldownTimer = 0.0f;
-    p.projectileSpeed = 500.0f;
-    p.stunTimer = 0.0f;
-    p.alive = true;
+Player CreatePlayer(Vector2 spawnPos, PlayerWeaponType type){ 
+    Player player = {0};
+    player.position = spawnPos;
+    player.type = type;
+    player.speed = 2.0f;
+    player.acceleration = 1.0f;
+    player.health = 250.0f;
+    player.attackRange = 12.0f;
+    player.attackDamage = 25.0f;
+    player.attackCooldown = 0.2f;
+    player.attackCooldownTimer = 0.0f;
+    player.projectileSpeed = 500.0f;
+    player.stunTimer = 0.0f;
+    player.alive = true;
+    player.width = 14;
+    player.height = 15;
 
-    return p;
+    return player;
 }

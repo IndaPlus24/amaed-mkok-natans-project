@@ -1,8 +1,10 @@
 #ifndef TILE_H
 #define TILE_H
 
-
-#include "raylib.h"
+// ---------------------
+// Macro Definitions
+// ---------------------
+#define tileSize 32         // Size of a tile in pixels
 
 struct Tile
 {

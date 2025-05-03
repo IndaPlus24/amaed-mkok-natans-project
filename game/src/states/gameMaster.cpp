@@ -2,10 +2,21 @@
 
 #include "gameMaster.h"
 #include "input.h"
+#include "gameData.h"
+#include "playerFunks.h"
+
+GameData gameData;
 
 void InitGM(dataGM initdata)
 {
     // Initiate floor, room, enemies, player, and so on.
+    gameData.player = CreatePlayer();
+    gameData.player.position = Vector2{(float)(tileSize * 4), (float)(tileSize * 4)};
+    
+    gameData.player.sheets[0] = LoadSpriteSheet("assets/sprites/n0llan.png", 8, 1);
+
+    gameData.currentRoom = CreateRoom(0, 20, 20);
+
 }
 
 GameState RunGM()
@@ -13,7 +24,7 @@ GameState RunGM()
     // Get inputs
     Inputs inputs = GetInputs();
 
-    // PlayerAct(&player, inputs, &room, &listOfEnemies);
+    PlayerUpdate(&gameData, &inputs);
 
     // AllEnemiesAct(ArrayOfEnemies, &room, &player);
 
@@ -26,8 +37,10 @@ GameState RunGM()
     BeginDrawing();
     ClearBackground(BLACK);
 
-    DrawText("Detta har inte implementerats än, var snäll och stick.", 0, 0, 60, WHITE);
-    DrawText("(Tryck på Escape-knappen)", 0, 60, 60, WHITE);
+    RoomDraw(&gameData.currentRoom);
+    PlayerDraw(&gameData.player);
+
+    DrawText("Test Room", 0, 0, 20, WHITE);
 
     // Draw everything!
 
