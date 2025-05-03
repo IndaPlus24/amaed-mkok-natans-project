@@ -4,12 +4,12 @@ EXE = AQoQ.exe
 
 LD = g++
 
-C_ARGS = -Igame/include/ -Igame/include/states/ -Igame/include/entities -Igame/include/dungeon -Igame/include/utils -Iengine/include/ -Wall
+C_ARGS = -Igame/include/ -Igame/include/states/ -Igame/include/entities -Igame/include/dungeon -Igame/include/utils -Iengine/include -Iengine/include/graphics -Wall
 
 # The directory for *.o files
 O_DIR = bin/
 
-MAIN_SRC = $(O_DIR)main.o $(O_DIR)mainMenu.o $(O_DIR)gameMaster.o $(O_DIR)input.o $(O_DIR)AI.o $(O_DIR)enemies.o $(O_DIR)player.o $(O_DIR)map.o ${O_DIR}entities.o
+MAIN_SRC = $(O_DIR)main.o $(O_DIR)mainMenu.o $(O_DIR)gameMaster.o $(O_DIR)input.o $(O_DIR)AI.o $(O_DIR)enemies.o $(O_DIR)player.o $(O_DIR)map.o ${O_DIR}entities.o ${O_DIR}spriteSheet.o
 
 default: main
 
@@ -22,7 +22,7 @@ $(O_DIR)main.o: game/src/main.cpp game/include/states/mainMenu.h game/include/st
 $(O_DIR)mainMenu.o: game/src/states/mainMenu.cpp game/include/states/mainMenu.h game/include/states/gameMaster.h engine/include/input.h
 	$(LD) $(C_ARGS) -c -o $(O_DIR)mainMenu.o game/src/states/mainMenu.cpp
 
-$(O_DIR)gameMaster.o: game/src/states/gameMaster.cpp game/include/states/gameMaster.h engine/include/input.h game/include/utils/gameData.h
+$(O_DIR)gameMaster.o: game/src/states/gameMaster.cpp game/include/states/gameMaster.h engine/include/input.h game/include/utils/gameData.h engine/include/graphics/spriteSheet.h
 	$(LD) $(C_ARGS) -c -o $(O_DIR)gameMaster.o game/src/states/gameMaster.cpp
 
 $(O_DIR)input.o: engine/src/input.cpp engine/include/input.h
@@ -43,6 +43,8 @@ ${O_DIR}enemies.o: game/src/entities/enemies.cpp game/include/entities/enemies.h
 ${O_DIR}entities.o: game/src/entities/entities.cpp game/include/entities/entityFunks.h
 	$(LD) $(C_ARGS) -c -o $(O_DIR)entities.o game/src/entities/entities.cpp
 
+${O_DIR}spriteSheet.o: engine/src/graphics/spriteSheet.cpp engine/include/graphics/spriteSheet.h
+	$(LD) $(C_ARGS) -c -o $(O_DIR)spriteSheet.o engine/src/graphics/spriteSheet.cpp
 
 
 game/include/states/gameMaster.h: game/include/states/gameState.h
@@ -51,6 +53,7 @@ game/include/entities/enemies.h: game/include/entities/AI.h game/include/entitie
 game/include/dungeon/map.h: game/include/dungeon/tile.h
 game/include/utils/gameData.h: game/include/entities/playerStruct.h game/include/entities/enemies.h game/include/dungeon/map.h
 game/include/entities/playerFunks.h: engine/include/input.h game/include/utils/gameData.h
+game/include/entities/playerStruct.h: engine/include/graphics/spriteSheet.h
 game/include/entities/entityFunks.h: game/include/utils/gameData.h
 
 clear:

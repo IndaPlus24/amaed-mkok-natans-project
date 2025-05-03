@@ -4,6 +4,10 @@
 #include <raylib.h>
 #include <raymath.h>
 
+#include "spriteSheet.h"
+
+#define PLAYER_SPRITE_SHEETS 1
+
 enum class PlayerState {
     Neutral,
     Attack,
@@ -22,7 +26,7 @@ typedef struct Player
     Vector2 direction;      // Current facing direction
     int width;              // Collision width
     int height;             // Collision height
-
+    SpriteSheet sheets[PLAYER_SPRITE_SHEETS];
 } Player;
 
 

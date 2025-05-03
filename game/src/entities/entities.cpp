@@ -8,7 +8,7 @@ bool EntityMove(Vector2 *pos, Vector2 move, int width, int height, GameData *gam
     if (move.x != 0)
     {
         int sign = move.x > 0 ? 1 : -1;
-        float margin = sign * width / 2;
+        float margin = floorf(sign * ((float)width) / 2);
 
         int y0 = (int)((pos->y - height / 2) / tileSize);       // y start
         int y1 = (int)((pos->y + height / 2 - 1) / tileSize);   // y end
@@ -48,7 +48,7 @@ bool EntityMove(Vector2 *pos, Vector2 move, int width, int height, GameData *gam
     if (move.y != 0)
     {
         int sign = move.y > 0 ? 1 : -1;
-        float margin = sign * width / 2;
+        float margin = floorf(sign * ((float)height) / 2);
 
         int y0 = (int)((pos->y) / tileSize);                    // y start
         int y1 = (int)((pos->y + move.y + margin) / tileSize);  // y limit

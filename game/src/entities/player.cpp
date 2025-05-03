@@ -11,8 +11,8 @@ Player CreatePlayer()
     player.state = PlayerState::Neutral;
     player.position = Vector2{0, 0};
     player.direction = Vector2{0, 1};
-    player.width = 20;
-    player.height = 20;
+    player.width = 14;
+    player.height = 15;
     return player;
 }
 
@@ -66,5 +66,27 @@ void PlayerUpdate(GameData *gameData, Inputs *inputs)
 
 void PlayerDraw(Player *player)
 {
-    DrawRectangle((int)(player->position.x - player->width / 2), (int)(player->position.y - player->height / 2), (int)player->width, (int)player->height, GREEN);
+    DrawRectangle((int)(player->position.x - ((player->width + 1) >> 1)), (int)(player->position.y - ((player->height + 1) >> 1)), (int)player->width, (int)player->height, GREEN);
+
+    // A "simple" "algoritm" to translate a vector into an integer representing its angle (clockwise is positive, (0,1) is 0)
+    int dir = 0;
+    if (player->direction.x != 0)
+    {
+        int a = player->direction.x > 0 ? -1 : 1;
+        int b = 1;
+        if (player->direction.y == 0)
+        {
+            b = 2;
+        }
+        else if (player->direction.y < 0)
+        {
+            b = 3;
+        }
+        dir = (8 + a * b) % 8;
+    }
+    else if (player->direction.y < 0)
+    {
+        dir = 4;
+    }
+    DrawCentre(&player->sheets[0], dir, 0, player->position);
 }

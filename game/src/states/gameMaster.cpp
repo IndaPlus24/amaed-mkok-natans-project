@@ -12,6 +12,9 @@ void InitGM(dataGM initdata)
     // Initiate floor, room, enemies, player, and so on.
     gameData.player = CreatePlayer();
     gameData.player.position = Vector2{(float)(tileSize * 4), (float)(tileSize * 4)};
+    
+    gameData.player.sheets[0] = LoadSpriteSheet("assets/sprites/n0llan.png", 8, 1);
+
     gameData.currentRoom = CreateRoom(0, 20, 20);
 
 }
