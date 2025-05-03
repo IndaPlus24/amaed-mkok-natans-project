@@ -7,7 +7,7 @@
 #include <raylib.h>
 #include <raymath.h>
 
-#include "enemies.h"
+#include "gameData.h"
 
 
 
@@ -48,13 +48,11 @@ void EnemyAttack(Enemy *enemy, Player *player)
         enemy->attackCooldownTimer = 0.0f; // Reset cooldown after attack
     }
 }
-bool EnemyLineOfSight(Enemy *enemy, Player *player, Tile *tileMap)
+bool EnemyLineOfSight(Enemy *enemy, Player *player, Room *room)
 {
     // Check if the enemy has line of sight to the player
     // This is a simple implementation, you might want to use raycasting or other methods for more complex scenarios
-    float distance = Vector2Distance(enemy->position, player->position);
     bool canSee = false;
-    Vector2 ray = enemy->position;
     for (int j = -rayCount; j <= rayCount / 2; j++)
     {
         // Calculate the angle offset for the ray based on the enemy's vision angle
@@ -80,7 +78,7 @@ bool EnemyLineOfSight(Enemy *enemy, Player *player, Tile *tileMap)
             int rayGridX = (int)(ray.x / tileSize);
             int rayGridY = (int)(ray.y / tileSize);
 
-            if (!tileMap[rayGridX][rayGridY].walkable)
+            if (!GetTile(room, rayGridX, rayGridY).isWalkable)
             {
                 break; // Ray hit an obstacle.
             }
@@ -106,8 +104,11 @@ bool EnemyLineOfSight(Enemy *enemy, Player *player, Tile *tileMap)
     return canSee; // Return true if the enemy can see the player, false otherwise.
 }
 
-void EnemyUpdate(Enemy *enemy, Player *player, Tile *tileMap)
+void EnemyUpdate(Enemy *enemy, GameData *gameData)
 {
+    Player *player = &gameData->player;
+    Room *room = gameData->currentRoom;
+    
     if (enemy->alive && enemy->stunTimer <= 0.0f)
     {
         // Move the enemy towards the target (player)
@@ -123,7 +124,7 @@ void EnemyUpdate(Enemy *enemy, Player *player, Tile *tileMap)
         // Check if the enemy is aware of the player
         if (enemy->aware == false)
         {
-            EnemyLineOfSight(enemy, player, tileMap); // Check if the enemy can see the player
+            EnemyLineOfSight(enemy, player, room); // Check if the enemy can see the player
         }
         if (enemy->aware == true) // two if statments on both values of aware is intended and not a mistake
         {
@@ -154,7 +155,9 @@ Enemies CreateEnemies(EnemySeeder *seeder)
         enemies.enemies[i].visionAngle = 90.0f;         // 90 degrees
         enemies.enemies[i].speed = 2.0f;
         enemies.enemies[i].position = seeder->positions[i]; // Set the position of the enemy
-        enemies.enemies[i].alive = true;                    // Set the enemy as alive
+        enemies.enemies[i].alive = true;                    // Set the enemy as 
+        enemies.enemies[i].width = 16;
+        enemies.enemies[i].height = 16;
         switch (seeder->type[i])
         {
         case ENEMY_MELEE:
@@ -179,4 +182,21 @@ Enemies CreateEnemies(EnemySeeder *seeder)
     }
 
     return enemies;
+}
+
+void EnemyDraw(Enemy *enemy) {
+    switch (enemy->type)
+    {
+    case ENEMY_MELEE:
+        DrawRectangle((int)(enemy->position.x - ((enemy->width + 1) >> 1)), (int)(enemy->position.y - ((enemy->height + 1) >> 1)), (int)enemy->width, (int)enemy->height, RED);
+        break;
+    
+    case ENEMY_RANGED:
+        DrawRectangle((int)(enemy->position.x - ((enemy->width + 1) >> 1)), (int)(enemy->position.y - ((enemy->height + 1) >> 1)), (int)enemy->width, (int)enemy->height, YELLOW);
+        break;
+    
+    default:
+        DrawText("ERROR", (int)enemy->position.x, (int)enemy->position.y, 20, RED);
+        break;
+    }
 }

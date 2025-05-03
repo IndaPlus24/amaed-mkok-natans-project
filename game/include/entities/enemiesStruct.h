@@ -1,19 +1,16 @@
-#ifndef ENEMIES_H
-#define ENEMIES_H
+#ifndef ENEMIES_S_H
+#define ENEMIES_S_H
 
 #include <stdbool.h>
 #include <raylib.h>
 #include <raymath.h>
-#include "AI.h"  
+#include "AI.h"
 
 // -- Macro Definitions --
-#define tileSize 32         // Size of a tile in pixels
 #define rayCount 16         // Number of rays to cast for line of sight
-#define DEG2RAD 0.017453292 // Conversion factor from degrees to radians
 
 // -- Forward Declarations --
 // These should be defined elsewhere.
-typedef struct Player Player;
 typedef struct Tile Tile;
 
 // -- Type Definitions --
@@ -57,6 +54,8 @@ typedef struct Enemy
     Vector2 direction;      // Current facing direction
     bool alive;
     float stunTimer;  // Timer for stun duration
+    int width;
+    int height;
 } Enemy;
 
 // Container for an array of enemies.
@@ -75,11 +74,5 @@ typedef struct EnemySeeder
     EnemyBehavior* behavior; // Array of enemy behaviors
 } EnemySeeder;
 
-// -- Function Prototypes --
-void EnemyMovement(Enemy *enemy, Vector2 target);
-void EnemyAttack(Enemy *enemy, Player *player);
-bool EnemyLineOfSight(Enemy *enemy, Player *player, Tile *tileMap);
-void EnemyUpdate(Enemy *enemy, Player *player, Tile *tileMap);
-Enemies CreateEnemies(EnemySeeder *seeder);
 
 #endif // ENEMIES_H

@@ -4,21 +4,22 @@
 struct Room;
 struct Door;
 
-
 #include <vector>
 #include "tile.h"
+
 // ---------------------
 // Room
 // ---------------------
 
 // ----------------------------
 // Room Types:
-// 
+//
 // 1. Corridor - Width or Height not wider than 2
 // 2. Fight Room - Few Obstacles
 // 3. Puzzle Room - More Obstacles and NPCs
 // 4. Boss Room - Not Fully Procedural (Predrawn) - Can have procedural elements
-enum class RoomType {
+enum class RoomType
+{
     Corridor,
     FightRoom,
     PuzzleRoom,
@@ -27,20 +28,20 @@ enum class RoomType {
 
 struct Room
 {
-    int id; 
+    int id;
     int width, height;
-    RoomType type; 
+    RoomType type;
     std::vector<int> tags;
     std::vector<Tile> tiles;
-    //Could add tags and such later...
+    // Could add tags and such later...
 };
 
-
 // ---------------------
-// Door: Connects 2 rooms. 
+// Door: Connects 2 rooms.
 // ---------------------
 
-struct Door {
+struct Door
+{
     int fromDir;
     int fromRoomOffset;
     int toRoomOffset;
@@ -58,10 +59,14 @@ struct Map
     std::vector<Door> doors;
 };
 
-Room createRoom(int id, int width, int height);
+Room CreateRoom(int id, int width, int height);
 
-Door createDoor(int fromId, int toId);
+Door CreateDoor(int fromId, int toId);
 
-void drawMap(const Map& map);
+void DrawMap(const Map &map);
+
+void RoomDraw(Room *room);
+
+Tile GetTile(Room *room, int x, int y);
 
 #endif
