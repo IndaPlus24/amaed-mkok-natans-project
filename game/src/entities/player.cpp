@@ -52,7 +52,7 @@ void PlayerMovement(Player *player, const Inputs *in)
 void PlayerAttack(Player *player, GameData *gameData, const Inputs *in)
 {
     PlayerFriction(player);
-    
+
     AttackUpdate(&player->attack, player->animationTime, player->position, player->direction, gameData);
     if (player->attack.done)
     {
@@ -61,11 +61,20 @@ void PlayerAttack(Player *player, GameData *gameData, const Inputs *in)
     }
 }
 
-void PlayerStartAttack(Player *player, GameData *gameData, const Inputs *in)
+void PlayerStartAttack(Player *player, GameData *gameData, const Inputs *in, int weapon)
 {
     player->animationTime = 0;
     player->state = PlayerState::Attack;
-    player->attack = CreateAttack(player, AttackType::testMelee);
+    switch (weapon)
+    {
+    case 0:
+        player->attack = CreateAttack(player, AttackType::testMelee);
+        break;
+    
+    case 1:
+        player->attack = CreateAttack(player, AttackType::testRanged);
+        break;
+    }
     PlayerAttack(player, gameData, in);
 }
 
@@ -82,7 +91,11 @@ void PlayerUpdate(GameData *gameData, const Inputs *in)
 
         if (in->a == ButtonState::Pressed)
         {
-            PlayerStartAttack(player, gameData, in);
+            PlayerStartAttack(player, gameData, in, 0);
+        }
+        else if (in->b == ButtonState::Pressed)
+        {
+            PlayerStartAttack(player, gameData, in, 1);
         }
         break;
 

@@ -10,4 +10,6 @@ void EnemyUpdate(Enemy *enemy, GameData *gameData);
 void EnemyDraw(Enemy *enemy);
 Enemies CreateEnemies(EnemySeeder *seeder);
 
+
+
 #endif

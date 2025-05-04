@@ -1,14 +1,11 @@
 #ifndef ATTACK_S_H
 #define ATTACK_S_H
 
+#include <unordered_set>
+
 #include <raylib.h>
 
-enum class Targets {
-    Player      = 0b0001,
-    Enemies     = 0b0010,
-    Corpses     = 0b0100, // Don't judge: maybe someone is into that
-    Self        = 0b1000, // Don't judge: maybe someone is into that
-};
+#include "collisionLayers.h"
 
 enum class AttackType {
     testMelee,
@@ -45,10 +42,12 @@ typedef struct KeyFrame
 typedef struct Attack
 {
     void *owner; // Make sure we don't hit the owner (unless we want to)
-    void **hits;  // Make sure we don't hit the same target multiple times (unless we want to)
-    int hitsCount;
+    std::unordered_set<void *> hits;  // Make sure we don't hit the same target multiple times (unless we want to)
 
-    Targets targets;
+    CollisionLayers targets;
+
+    float damage;
+    float force;
 
     // float lastCheck; // Timestamp of the last time this thing was checked
 
