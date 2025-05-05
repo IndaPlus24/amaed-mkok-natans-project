@@ -13,7 +13,7 @@ Room CreateRoom(int id, int width, int height, RoomType type)
     room.width = width;
     room.type = type;
     // room.tags;
-    // room.tiles;
+    room.tiles = (Tile *)malloc(sizeof(Tile) * width * height);
     return room;
 }
 
@@ -120,7 +120,8 @@ void RoomDraw(Room *room)
 // TEMPORARY FUNCTION
 Tile GetTile(Room *room, int x, int y)
 {
-    Tile tile;
+    Tile tile = room->tiles[x + y * room->width];
+    /*
     if (x < 1 || x >= room->width - 1 || y < 1 || y >= room->height - 1)
     {
         tile.walkable = false;
@@ -128,6 +129,6 @@ Tile GetTile(Room *room, int x, int y)
     else
     {
         tile.walkable = true;
-    }
+    }*/
     return tile;
 }
