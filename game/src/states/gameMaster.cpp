@@ -4,6 +4,8 @@
 #include "input.h"
 #include "gameData.h"
 #include "playerFunks.h"
+#include "enemiesFunks.h"
+
 
 GameData gameData;
 Room a;
@@ -11,12 +13,18 @@ Room a;
 void InitGM(dataGM initdata)
 {
     // Initiate floor, room, enemies, player, and so on.
-    gameData.player = CreatePlayer(Vector2{(float)(tileSize * 4), (float)(tileSize * 4)});
+    gameData.player = CreatePlayer(Vector2{(float)(tileSize * 25), (float)(tileSize * 15)});
+    Vector2 enemyPos[2] = {Vector2{(float)(tileSize * 10), (float)(tileSize * 10)}, Vector2{(float)(tileSize * 15), (float)(tileSize * 15)}};
+    EnemyType enemyTypes[2] = {ENEMY_MELEE, ENEMY_MELEE};
+    EnemyBehavior enemyBehaviors[2] = {BEHAVIOR_RUSH, BEHAVIOR_RUSH};
+
+    gameData.enemies = CreateEnemies(CreateEnemySeeder(2, enemyPos, enemyTypes , enemyBehaviors));
 
     gameData.player.sheets[0] = LoadSpriteSheet("assets/sprites/n0llan.png", 8, 1);
 
     //a = CreateRoom(0, 20, 20);
-    a = DrunkardsWalk(0, 20, 20, 1000);
+    a = DrunkardsWalk(0, 50, 30, 15);
+    
     gameData.currentRoom = &a;
 
     BeginDrawing();
@@ -29,6 +37,8 @@ GameState RunGM()
     Inputs inputs = GetInputs();
 
     PlayerUpdate(&gameData, &inputs);
+
+    EnemyUpdate(&gameData.enemies.enemies[0], &gameData);
 
     // AllEnemiesAct(ArrayOfEnemies, &room, &player);
 
@@ -43,6 +53,8 @@ GameState RunGM()
 
     RoomDraw(gameData.currentRoom);
     PlayerDraw(&gameData.player);
+    EnemyDraw(&gameData.enemies.enemies[0]);
+    EnemyDraw(&gameData.enemies.enemies[1]);
 
     DrawText("Test Room", 0, 0, 20, WHITE);
 
