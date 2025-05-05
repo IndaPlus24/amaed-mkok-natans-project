@@ -15,7 +15,8 @@ void InitGM(dataGM initdata)
 
     gameData.player.sheets[0] = LoadSpriteSheet("assets/sprites/n0llan.png", 8, 1);
 
-    a = CreateRoom(0, 20, 20);
+    //a = CreateRoom(0, 20, 20);
+    a = DrunkardsWalk(0, 20, 20, 1000);
     gameData.currentRoom = &a;
 
     BeginDrawing();
