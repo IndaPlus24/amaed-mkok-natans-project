@@ -61,6 +61,8 @@ struct Map
 
 Room CreateRoom(int id, int width, int height);
 
+Room DrunkardsWalk(int id, int width, int height, int iterations);
+
 Door CreateDoor(int fromId, int toId);
 
 void DrawMap(const Map &map);
