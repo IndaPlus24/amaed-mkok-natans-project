@@ -269,11 +269,34 @@ void EnemyDraw(Enemy *enemy)
         break;
 
     case ENEMY_RANGED:
-        DrawRectangle((int)(enemy->position.x - ((enemy->width + 1) >> 1)), (int)(enemy->position.y - ((enemy->height + 1) >> 1)), (int)enemy->width, (int)enemy->height, YELLOW);
+        DrawRectangle((int)(enemy->position.x - ((enemy->width + 1) >> 1)), (int)(enemy->position.y - ((enemy->height + 1) >> 1)), (int)enemy->width, (int)enemy->height, PURPLE);
         break;
 
     default:
         DrawText("ERROR", (int)enemy->position.x, (int)enemy->position.y, 20, RED);
         break;
     }
+
+    if (!enemy->alive)
+    {
+        DrawCircle(enemy->position.x, enemy->position.x, enemy->width / 2, BLACK);
+        return;
+    }
+
+    if (enemy->aware) {
+        DrawCircle(enemy->position.x, enemy->position.x, enemy->width / 3, YELLOW);
+    }
+
+    switch (enemy->state)
+    {
+    case EnemyStates::Neutral:
+        break;
+    case EnemyStates::Attacking:
+        DrawCircle(enemy->position.x, enemy->position.x, enemy->width / 2, BLUE);
+        AttackDebugDraw(&enemy->attack, enemy->position, enemy->direction);
+        break;
+    }
+
+
+    DrawLine(enemy->position.x, enemy->position.y, enemy->position.x + enemy->direction.x *10, enemy->position.y + enemy->direction.y * 10, WHITE);
 }
