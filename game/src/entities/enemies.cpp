@@ -23,7 +23,6 @@ void EnemyMovement(Enemy *enemy, Vector2 target, GameData *gameData)
 {
     // Calculate direction from enemy to target
     Vector2 direction = Vector2Subtract(target, enemy->position);
-    enemy->direction = direction; // Update enemy direction
     // Calculate distance to target
     float distance = Vector2Length(direction);
 
@@ -31,6 +30,7 @@ void EnemyMovement(Enemy *enemy, Vector2 target, GameData *gameData)
     {
         // Normalize the direction vector
         direction = Vector2Normalize(direction);
+        enemy->direction = direction; // Update enemy direction
 
         // accelerate in the direction of the target
         enemy->velocity = Vector2Add(enemy->velocity, Vector2Scale(direction, enemy->acceleration * GetFrameTime()));
@@ -41,7 +41,8 @@ void EnemyMovement(Enemy *enemy, Vector2 target, GameData *gameData)
             enemy->velocity = Vector2Scale(Vector2Normalize(enemy->velocity), enemy->speed);
         }
     }
-    else {
+    else
+    {
         EnemyFriction(enemy);
     }
 }
@@ -68,7 +69,7 @@ void EnemyStartAttack(Enemy *enemy, GameData *gameData)
     case ENEMY_RANGED:
         enemy->attack = CreateAttack(enemy, AttackType::testEnemyRanged);
         break;
-    case ENEMY_NONE: 
+    case ENEMY_NONE:
         // Why is this a thing that exists? - N
         break;
     }
@@ -215,6 +216,8 @@ Enemies CreateEnemies(EnemySeeder *seeder)
         enemies.enemies[i].state = EnemyStates::Neutral;
         enemies.enemies[i].animationTime = 0.0f;
         enemies.enemies[i].friction = 15.0f;
+        float r = GetRandomValue(0, 7) / 4 * PI;
+        enemies.enemies[i].direction = Vector2{cos(r), sin(r)};
         switch (seeder->type[i])
         {
         case ENEMY_MELEE:
@@ -283,7 +286,8 @@ void EnemyDraw(Enemy *enemy)
         return;
     }
 
-    if (enemy->aware) {
+    if (enemy->aware)
+    {
         DrawCircle(enemy->position.x, enemy->position.x, enemy->width / 3, YELLOW);
     }
 
@@ -297,6 +301,5 @@ void EnemyDraw(Enemy *enemy)
         break;
     }
 
-
-    DrawLine(enemy->position.x, enemy->position.y, enemy->position.x + enemy->direction.x *10, enemy->position.y + enemy->direction.y * 10, WHITE);
+    DrawLine(enemy->position.x, enemy->position.y, enemy->position.x + enemy->direction.x * 10, enemy->position.y + enemy->direction.y * 10, WHITE);
 }
