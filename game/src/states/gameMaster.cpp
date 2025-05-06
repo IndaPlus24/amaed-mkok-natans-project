@@ -36,16 +36,12 @@ GameState RunGM()
 
     PlayerUpdate(&gameData, &inputs);
 
-    // AllEnemiesAct(ArrayOfEnemies, &room, &player);
-
-    // nextRoom = FunctionThatReturnsWhatRoomThePlayerIsGoingToOrNull();
-
-    // if (nextRoom != NULL) {
-    //     LoadRoom(nextRoom);
-    // }
-
     for (int i = - gameData.projectiles.count; i < 0; i++) {
         ProjectileUpdate(gameData.projectiles.list + gameData.projectiles.count + i, &gameData);
+    }
+
+    if (inputs.c == ButtonState::Pressed) {
+        PlayerGetHit(&gameData.player, 20.0f, Vector2{400.0f, 0});
     }
 
     BeginDrawing();
@@ -58,7 +54,8 @@ GameState RunGM()
         ProjectileDebugDraw(gameData.projectiles.list + i);
     }
 
-    DrawText("Test Room", 0, 0, 20, WHITE);
+    DrawText("Test Room. Current test: Hit the player by pressing [L]", 0, 0, 20, WHITE);
+    DrawText(TextFormat("Player Health: %.2f", gameData.player.health), 0, 20, 20, WHITE);
 
     // Draw everything!
 

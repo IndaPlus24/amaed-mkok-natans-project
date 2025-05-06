@@ -1,6 +1,7 @@
 #include <unordered_set>
 
 #include "entityFunks.h"
+#include "playerFunks.h"
 
 bool EntityMove(Vector2 *pos, Vector2 move, int width, int height, GameData *gameData)
 {
@@ -201,8 +202,8 @@ void AttackEntity(void *entity, void *source, GameData *gameData, float damage, 
     {
     case CollisionLayers::Player:
     {
-        // Player *ptr = (Player *)entity;
-        // Make a relevant function to put it in - N
+        Player *ptr = (Player *)entity;
+        PlayerGetHit(ptr, damage, force);
         break;
     }
 

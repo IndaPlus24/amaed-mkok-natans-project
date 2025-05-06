@@ -12,13 +12,13 @@
 enum class PlayerState {
     Neutral,
     Attack,
+    Stunned,
     Dead,
 };
 
 typedef struct Player
 {
-    int health;
-    // int damage;
+    float health;
     PlayerState state;
     float animationTime;
     float speed;            // Max speed
@@ -30,6 +30,8 @@ typedef struct Player
     int width;              // Collision width
     int height;             // Collision height
     Attack attack;
+    float invincibilityTimer;
+    float invincibilityDuration;
     SpriteSheet sheets[PLAYER_SPRITE_SHEETS];
 } Player;
 
