@@ -7,5 +7,6 @@
 void PlayerUpdate(GameData *gameData, const Inputs *in);
 void PlayerDraw(Player *player);
 Player CreatePlayer(Vector2 spawnPos);
+void PlayerGetHit(Player *player, float damage, Vector2 force);
 
 #endif

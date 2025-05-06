@@ -162,6 +162,8 @@ GameState runMM()
         dataGM d;
         InitGM(d);
         InitMM();
+        BeginDrawing();
+        EndDrawing();
         return GameState::GameMaster;
     default:
         break;
