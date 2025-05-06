@@ -1,4 +1,7 @@
 #include <raylib.h>
+#include <raymath.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "gameMaster.h"
 #include "input.h"
