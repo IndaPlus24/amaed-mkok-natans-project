@@ -108,7 +108,7 @@ bool EnemyLineOfSight(Enemy *enemy, Player *player, Room *room)
             int rayGridX = (int)(ray.x / tileSize);
             int rayGridY = (int)(ray.y / tileSize);
 
-            if (!GetTile(room, rayGridX, rayGridY).isWalkable)
+            if (!GetTile(room, rayGridX, rayGridY).walkable)
             {
                 break; // Ray hit an obstacle.
             }
@@ -302,4 +302,22 @@ void EnemyDraw(Enemy *enemy)
     }
 
     DrawLine(enemy->position.x, enemy->position.y, enemy->position.x + enemy->direction.x * 10, enemy->position.y + enemy->direction.y * 10, WHITE);
+}
+
+EnemySeeder* CreateEnemySeeder(int count, Vector2* positions, EnemyType* type, EnemyBehavior* behavior)
+{
+    EnemySeeder* seeder = (EnemySeeder*)malloc(sizeof(EnemySeeder));
+    seeder->count = count;
+    seeder->positions = (Vector2*)malloc(sizeof(Vector2) * count);
+    seeder->type = (EnemyType*)malloc(sizeof(EnemyType) * count);
+    seeder->behavior = (EnemyBehavior*)malloc(sizeof(EnemyBehavior) * count);
+
+    for (int i = 0; i < count; i++)
+    {
+        seeder->positions[i] = positions[i];
+        seeder->type[i] = type[i];
+        seeder->behavior[i] = behavior[i];
+    }
+
+    return seeder;
 }

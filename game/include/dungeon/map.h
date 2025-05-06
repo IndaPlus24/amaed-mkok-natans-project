@@ -32,7 +32,7 @@ struct Room
     int width, height;
     RoomType type;
     std::vector<int> tags;
-    std::vector<Tile> tiles;
+    Tile* tiles;
     // Could add tags and such later...
 };
 
@@ -60,6 +60,8 @@ struct Map
 };
 
 Room CreateRoom(int id, int width, int height);
+
+Room DrunkardsWalk(int id, int width, int height, int iterations);
 
 Door CreateDoor(int fromId, int toId);
 

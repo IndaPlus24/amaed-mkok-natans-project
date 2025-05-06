@@ -13,4 +13,6 @@ void EnemyGetHit(Enemy *enemy, float damage, Vector2 force);
 
 
 
+EnemySeeder* CreateEnemySeeder(int count, Vector2* positions, EnemyType* type, EnemyBehavior* behavior);
+
 #endif
