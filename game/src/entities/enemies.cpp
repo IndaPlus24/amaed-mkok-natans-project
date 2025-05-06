@@ -51,7 +51,6 @@ void EnemyAttack(Enemy *enemy, Player *player)
 bool EnemyLineOfSight(Enemy *enemy, Player *player, Room *room)
 {
     // Check if the enemy has line of sight to the player
-    // This is a simple implementation, you might want to use raycasting or other methods for more complex scenarios
     bool canSee = false;
     for (int j = -rayCount; j <= rayCount / 2; j++)
     {
@@ -123,13 +122,18 @@ void EnemyUpdate(Enemy *enemy, GameData *gameData)
 
         // - enemy pathfinding (A* or Dijkstra's algorithm) to find the best path to the player
         Vector2 target = GetFlowFieldDirection((int)(enemy->position.x / tileSize), (int)(enemy->position.y / tileSize)); // Get the flow field direction for the enemy
+        printf("Enemy position: %f, %f\n", enemy->position.x, enemy->position.y);
+        printf("Target position: %f, %f\n", target.x, target.y);
         EnemyMovement(enemy, target);
         enemy->attackCooldownTimer += GetFrameTime(); // Update the attack cooldown timer
 
         // Check if the enemy is aware of the player
         if (enemy->aware == false)
         {
+            enemy->direction = Vector2Subtract(player->position, enemy->position); // Update the enemy direction
+            enemy->direction = Vector2Normalize(enemy->direction); // Normalize the direction vector
             EnemyLineOfSight(enemy, player, room); // Check if the enemy can see the player
+            printf("Enemy aware: %d\n", enemy->aware);
         }
         if (enemy->aware == true) // two if statments on both values of aware is intended and not a mistake
         {
@@ -158,7 +162,7 @@ Enemies CreateEnemies(EnemySeeder *seeder)
         enemies.enemies[i].damage = 15;
         enemies.enemies[i].visionRange = 25 * tileSize; // 5 tiles
         enemies.enemies[i].visionAngle = 90.0f;         // 90 degrees
-        enemies.enemies[i].speed = 2.0f;
+        enemies.enemies[i].speed = 100.0f;
         enemies.enemies[i].position = seeder->positions[i]; // Set the position of the enemy
         enemies.enemies[i].alive = true;                    // Set the enemy as
         enemies.enemies[i].width = 16;
@@ -171,7 +175,7 @@ Enemies CreateEnemies(EnemySeeder *seeder)
             enemies.enemies[i].attackDamage = 10;
             enemies.enemies[i].attackCooldown = 0.3f; // .3 second cooldown
             enemies.enemies[i].attackCooldownTimer = 0.0f;
-            enemies.enemies[i].acceleration = 0.8f; // Acceleration of the enemy
+            enemies.enemies[i].acceleration = 1.8f; // Acceleration of the enemy
             break;
         case ENEMY_RANGED:
             enemies.enemies[i].type = ENEMY_RANGED;
@@ -179,7 +183,7 @@ Enemies CreateEnemies(EnemySeeder *seeder)
             enemies.enemies[i].attackDamage = 8;
             enemies.enemies[i].attackCooldown = 0.8f; // .8 second cooldown
             enemies.enemies[i].attackCooldownTimer = 0.0f;
-            enemies.enemies[i].acceleration = 1.0f; // Acceleration of the enemy
+            enemies.enemies[i].acceleration = 2.0f; // Acceleration of the enemy
             break;
         default:
             break;
