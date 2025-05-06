@@ -133,17 +133,16 @@ void ThingThatEvaluatesKeyFrames(const KeyFrame *keyFrame, Attack *attack, Vecto
         break;
 
     case AttackAction::End:
-        free(attack->keyFrames);
-        if (attack->hitBoxCount) {
-            free(attack->hitBoxes);
-        }
-        attack->done = true;
+        AttackForceEnd(attack);
         break;
     }
 }
 
 void AttackUpdate(Attack *attack, float timestamp, Vector2 pos, Vector2 dir, GameData *gameData)
 {
+    if (attack->done)
+        return;
+
     for (int i = 0; i < attack->hitBoxCount; i++)
     {
         if (attack->hitBoxes[i].active)
@@ -167,14 +166,9 @@ void AttackUpdate(Attack *attack, float timestamp, Vector2 pos, Vector2 dir, Gam
     }
 
     // They are supposed to have an AttackAction::End at the end, but I don't want memory leaks because people are stupid
-    if (attack->currentKeyIndex == attack->keyFrameCount && !attack->done)
+    if (attack->currentKeyIndex == attack->keyFrameCount)
     {
-        free(attack->keyFrames);
-        if (attack->hitBoxCount)
-        {
-            free(attack->hitBoxes);
-        }
-        attack->done = true;
+        AttackForceEnd(attack);
     }
 }
 
@@ -196,4 +190,17 @@ void AttackDebugDraw(const Attack *attack, Vector2 pos, Vector2 dir)
             DrawRectangle(x0, y0, hitBox->width, hitBox->height, DARKGREEN);
         }
     }
+}
+
+void AttackForceEnd(Attack *attack)
+{
+    if (attack->done)
+        return;
+
+    free(attack->keyFrames);
+    if (attack->hitBoxCount)
+    {
+        free(attack->hitBoxes);
+    }
+    attack->done = true;
 }
