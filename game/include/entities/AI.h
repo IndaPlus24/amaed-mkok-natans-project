@@ -4,6 +4,8 @@
 #include "raylib.h"
 #include "gameData.h"
 
+struct GameData;
+
 const int GRID_WIDTH = 100;
 const int GRID_HEIGHT = 100;
 

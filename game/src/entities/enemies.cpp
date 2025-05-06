@@ -112,7 +112,7 @@ void EnemyUpdate(Enemy *enemy, GameData *gameData)
         // TODO : Implement more advanced AI for enemy movement
         // - four types of enemy pathing, ranged (Tries to stay at a good range to hit the player), flanking (tries to cut off the player), guard (guards their target, for example a ranged unit), rush (Just charges at the player which is basically the current behavior but pathfinding is not implemented yet)
 
-        if (frameCount % 30 == 0) // Updates every 30 frammes 1/2 second at 60 fps to reduce CPU load
+        if (frameCount % 3 == 0) // Updates every 30 frammes 1/2 second at 60 fps to reduce CPU load
         {
             ComputeFlowField((int)(player->position.x / tileSize), (int)(player->position.y / tileSize), gameData); // Compute the flow field from the player's position
         }
@@ -159,7 +159,7 @@ Enemies CreateEnemies(EnemySeeder *seeder)
         enemies.enemies[i].damage = 15;
         enemies.enemies[i].visionRange = 25 * tileSize; // 5 tiles
         enemies.enemies[i].visionAngle = 90.0f;         // 90 degrees
-        enemies.enemies[i].speed = 100.0f;
+        enemies.enemies[i].speed = 200.0f;
         enemies.enemies[i].position = seeder->positions[i]; // Set the position of the enemy
         enemies.enemies[i].alive = true;                    // Set the enemy as
         enemies.enemies[i].width = 16;
@@ -172,7 +172,7 @@ Enemies CreateEnemies(EnemySeeder *seeder)
             enemies.enemies[i].attackDamage = 10;
             enemies.enemies[i].attackCooldown = 0.3f; // .3 second cooldown
             enemies.enemies[i].attackCooldownTimer = 0.0f;
-            enemies.enemies[i].acceleration = 1.8f; // Acceleration of the enemy
+            enemies.enemies[i].acceleration = 200000.0f; // Acceleration of the enemy
             break;
         case ENEMY_RANGED:
             enemies.enemies[i].type = ENEMY_RANGED;
@@ -180,7 +180,7 @@ Enemies CreateEnemies(EnemySeeder *seeder)
             enemies.enemies[i].attackDamage = 8;
             enemies.enemies[i].attackCooldown = 0.8f; // .8 second cooldown
             enemies.enemies[i].attackCooldownTimer = 0.0f;
-            enemies.enemies[i].acceleration = 2.0f; // Acceleration of the enemy
+            enemies.enemies[i].acceleration = 200.0f; // Acceleration of the enemy
             break;
         default:
             break;
