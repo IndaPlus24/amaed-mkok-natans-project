@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "map.h"
+#include "enemiesFunks.h"
+
 
 // TEMPORARY FUNCTION
 Room CreateRoom(int id, int width, int height, RoomType type)
@@ -33,6 +35,29 @@ Door CreateDoor(int fromId, int toId)
 void DrawMap(const Map &map)
 {
     // I don't really get what this is supposed to do.
+}
+
+Room* CreateMap(int floors, int roomsPerFloor, int width, int height, int floorSwitch)
+{
+    Room *map = (Room *)malloc(sizeof(Room) * floors * roomsPerFloor);
+    for (int i = 0; i < floors; i++)
+    {
+        for (int j = 0; j < roomsPerFloor; j++)
+        {
+            if(i >= floorSwitch)
+            {
+                map[i * roomsPerFloor + j] = DrunkardsWalk(i * roomsPerFloor + j, width, height, 15);
+            }
+            else
+            {
+                map[i * roomsPerFloor + j] = CreateRoom(i * roomsPerFloor + j, width, height, RoomType::FightRoom);
+            }
+        }
+        
+    }
+    
+    
+    return map;
 }
 
 Room DrunkardsWalk(int id, int width, int height, int iterations)
@@ -101,6 +126,7 @@ Room DrunkardsWalk(int id, int width, int height, int iterations)
             i--;
         }
     }
+    return room;
 }
 
 void RoomDraw(Room *room)
