@@ -1,4 +1,7 @@
 #include <raylib.h>
+#include <raymath.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "gameMaster.h"
 #include "input.h"
@@ -24,7 +27,7 @@ void InitGM(dataGM initdata)
 
     gameData.player.sheets[0] = LoadSpriteSheet("assets/sprites/n0llan.png", 8, 1);
 
-    a = DrunkardsWalk(0, 50, 30, 15);
+    a = DrunkardsWalk(0, 50, 30, 150);
     
     gameData.currentRoom = &a;
     
@@ -40,6 +43,12 @@ GameState RunGM()
 
     PlayerUpdate(&gameData, &inputs);
 
+    //UPDATES ALL ENEMIES   
+    for (int i = 0; i < gameData.enemies.count; i++)
+    {
+        EnemyUpdate(&gameData.enemies.enemies[i], &gameData);
+    }
+    // EnemyUpdate(&gameData.enemies.enemies[0], &gameData); // - Assuming this is a mistake - N
 
     for (int i = - gameData.projectiles.count; i < 0; i++) {
         ProjectileUpdate(gameData.projectiles.list + gameData.projectiles.count + i, &gameData);
