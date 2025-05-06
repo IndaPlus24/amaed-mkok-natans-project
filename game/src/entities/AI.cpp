@@ -30,8 +30,8 @@ const int dy[4] = { 0,  0,  1, -1 };
 void ComputeFlowField(int playerGridX, int playerGridY, GameData *gameData)
 {
     // Initialize the cost for every cell to infinity.
-    for (int i = 0; i < GRID_WIDTH; i++) {
-        for (int j = 0; j < GRID_HEIGHT; j++) {
+    for (int i = 0; i < gameData->currentRoom->width; i++) {
+        for (int j = 0; j < gameData->currentRoom->height; j++) {
             grid[i][j].cost = INF;
             grid[i][j].walkable = gameData->currentRoom->tiles[i + j * gameData->currentRoom->width].walkable;
         }

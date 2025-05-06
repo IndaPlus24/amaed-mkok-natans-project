@@ -12,7 +12,6 @@
 #include "entityFunks.h"
 #include "attackFunks.h"
 
-
 #define STUN_DURATION 0.4f
 
 void EnemyFriction(Enemy *enemy)
@@ -23,16 +22,11 @@ int frameCount = 0; // to allow for update of flow field every framecount % x ==
 
 void EnemyMovement(Enemy *enemy, Vector2 target, GameData *gameData)
 {
-
-    // Calculate direction from enemy to target
-    Vector2 direction = Vector2Subtract(target, enemy->position);
-    // Calculate distance to target
-    float distance = Vector2Length(direction);
+    Vector2 direction = target;                                // Direction vector from enemy to target
+    float distance = Vector2Distance(enemy->position, target); // Distance to the target
 
     if (distance > 0)
     {
-        // Normalize the direction vector
-        direction = Vector2Normalize(direction);
         enemy->direction = direction; // Update enemy direction
 
         // accelerate in the direction of the target
@@ -153,13 +147,11 @@ void EnemyNeutral(Enemy *enemy, GameData *gameData)
 
     // - enemy pathfinding (A* or Dijkstra's algorithm) to find the best path to the player
     Vector2 target = GetFlowFieldDirection((int)(enemy->position.x / tileSize), (int)(enemy->position.y / tileSize)); // Get the flow field direction for the enemy
-    // printf("Enemy position: %f, %f\n", enemy->position.x, enemy->position.y);
-    // printf("Target position: %f, %f\n", target.x, target.y);
     EnemyMovement(enemy, target, gameData);
     enemy->attackCooldownTimer += GetFrameTime(); // Update the attack cooldown timer
-    
+
     EnemyLineOfSight(enemy, player, room); // Check if the enemy can see the player
-    
+
     // Check if the enemy is aware of the player
     if (enemy->aware == false)
     {
@@ -205,6 +197,7 @@ void EnemyUpdate(Enemy *enemy, GameData *gameData)
     // Update the enemy's position using its current velocity
     Vector2 move = Vector2Scale(enemy->direction, GetFrameTime());
     EntityMove(&enemy->position, move, enemy->width, enemy->height, gameData);
+    frameCount++;
 }
 
 Enemies CreateEnemies(EnemySeeder *seeder)
@@ -226,7 +219,7 @@ Enemies CreateEnemies(EnemySeeder *seeder)
         enemies.enemies[i].height = 16;
         enemies.enemies[i].state = EnemyStates::Neutral;
         enemies.enemies[i].animationTime = 0.0f;
-        enemies.enemies[i].friction = 15.0f;
+        enemies.enemies[i].friction = 5.0f;
         float r = GetRandomValue(0, 7) / 4 * PI;
         enemies.enemies[i].direction = Vector2{cos(r), sin(r)};
         switch (seeder->type[i])
@@ -237,7 +230,7 @@ Enemies CreateEnemies(EnemySeeder *seeder)
             enemies.enemies[i].attackDamage = 10;
             enemies.enemies[i].attackCooldown = 0.3f; // .3 second cooldown
             enemies.enemies[i].attackCooldownTimer = 0.0f;
-            enemies.enemies[i].acceleration = 200000.0f; // Acceleration of the enemy
+            enemies.enemies[i].acceleration = 200.0f; // Acceleration of the enemy
             break;
         case ENEMY_RANGED:
             enemies.enemies[i].type = ENEMY_RANGED;
@@ -254,7 +247,6 @@ Enemies CreateEnemies(EnemySeeder *seeder)
 
     return enemies;
 }
-
 
 void EnemyGetHit(Enemy *enemy, float damage, Vector2 force)
 {
