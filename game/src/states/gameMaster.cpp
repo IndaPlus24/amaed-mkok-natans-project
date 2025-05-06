@@ -41,23 +41,30 @@ GameState RunGM()
     }
 
     if (inputs.c == ButtonState::Pressed) {
-        PlayerGetHit(&gameData.player, 20.0f, Vector2{400.0f, 0});
+        PlayerGetHit(&gameData.player, 2500000.0f, Vector2{40000.0f, 0});
     }
 
     BeginDrawing();
     ClearBackground(BLACK);
 
     RoomDraw(gameData.currentRoom);
+    
     PlayerDraw(&gameData.player);
+
 
     for (int i = 0; i <  gameData.projectiles.count; i++) {
         ProjectileDebugDraw(gameData.projectiles.list + i);
     }
 
-    DrawText("Test Room. Current test: Hit the player by pressing [L]", 0, 0, 20, WHITE);
-    DrawText(TextFormat("Player Health: %.2f", gameData.player.health), 0, 20, 20, WHITE);
+    if (gameData.player.state == PlayerState::Dead) {
+        if (gameData.player.animationTime > 5.0f) return GameState::GameOver;
 
-    // Draw everything!
+        DrawRectangle(0,0, GetScreenWidth(), GetScreenHeight(), Color{0,0,0, (unsigned char)((gameData.player.animationTime / 5) * 255)});
+        DrawText(TextFormat("Player Died %.2f seconds ago", gameData.player.animationTime), 0, 20, 20, WHITE);
+    }
+
+    DrawText("Test Room. Current test: Make the player (figuratively) explode by pressing [L]", 0, 0, 20, WHITE);
+    
 
     EndDrawing();
 
