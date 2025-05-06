@@ -139,17 +139,17 @@ void PlayerDraw(Player *player)
     switch (player->state)
     {
     case PlayerState::Neutral:
-        DrawRectangle((int)(player->position.x - ((player->width + 1) >> 1)), (int)(player->position.y - ((player->height + 1) >> 1)), (int)player->width, (int)player->height, GREEN);
+        DrawRectangle((int)(player->position.x - ((player->width) >> 1)), (int)(player->position.y - ((player->height) >> 1)), (int)player->width, (int)player->height, GREEN);
         DrawCentre(&player->sheets[0], dir, 0, player->position);
         /* code */
         break;
     case PlayerState::Attack:
-        DrawRectangle((int)(player->position.x - ((player->width + 1) >> 1)), (int)(player->position.y - ((player->height + 1) >> 1)), (int)player->width, (int)player->height, ORANGE);
+        DrawRectangle((int)(player->position.x - ((player->width) >> 1)), (int)(player->position.y - ((player->height) >> 1)), (int)player->width, (int)player->height, ORANGE);
         DrawCentre(&player->sheets[0], dir, 0, player->position);
         AttackDebugDraw(&player->attack, player->position, player->direction);
         break;
     case PlayerState::Dead:
-        DrawRectangle((int)(player->position.x - ((player->width + 1) >> 1)), (int)(player->position.y - ((player->height + 1) >> 1)), (int)player->width, (int)player->height, DARKBLUE);
+        DrawRectangle((int)(player->position.x - ((player->width) >> 1)), (int)(player->position.y - ((player->height) >> 1)), (int)player->width, (int)player->height, DARKBLUE);
         DrawCentre(&player->sheets[0], dir, 0, player->position);
         break;
     default:
@@ -162,12 +162,13 @@ Player CreatePlayer(Vector2 spawnPos)
 {
     Player player = {0};
     player.position = spawnPos;
+    player.direction = Vector2{0.0f,1.0f};
     player.speed = 200.0f;
     player.acceleration = 4000.0f;
     player.friction = 25.0f;
     player.health = 250.0f;
     player.width = 14;
-    player.height = 15;
+    player.height = 16;
 
     return player;
 }
