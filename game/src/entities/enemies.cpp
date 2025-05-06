@@ -13,11 +13,8 @@ int frameCount = 0; // to allow for update of flow field every framecount % x ==
 
 void EnemyMovement(Enemy *enemy, Vector2 target)
 {
-    // Calculate direction from enemy to target
-    Vector2 direction = Vector2Subtract(target, enemy->position);
-    enemy->direction = direction; // Update enemy direction
-    // Calculate distance to target
-    float distance = Vector2Length(direction);
+    Vector2 direction = target; // Direction vector from enemy to target
+    float distance = 1.0f;
 
     if (distance > 0)
     {
