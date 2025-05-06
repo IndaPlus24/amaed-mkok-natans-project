@@ -5,6 +5,7 @@
 #include "gameData.h"
 #include "playerFunks.h"
 #include "projectilesFunks.h"
+#include "enemiesFunks.h"
 
 GameData gameData;
 Room a;
@@ -41,7 +42,10 @@ GameState RunGM()
     }
 
     if (inputs.c == ButtonState::Pressed) {
-        PlayerGetHit(&gameData.player, 2500000.0f, Vector2{40000.0f, 0});
+        for (int i = 0; i < gameData.enemies.count; i++) {
+            
+        EnemyGetHit(gameData.enemies.enemies + i, 50.0f, Vector2{400.0f, 0});
+        }
     }
 
     BeginDrawing();
@@ -60,10 +64,9 @@ GameState RunGM()
         if (gameData.player.animationTime > 5.0f) return GameState::GameOver;
 
         DrawRectangle(0,0, GetScreenWidth(), GetScreenHeight(), Color{0,0,0, (unsigned char)((gameData.player.animationTime / 5) * 255)});
-        DrawText(TextFormat("Player Died %.2f seconds ago", gameData.player.animationTime), 0, 20, 20, WHITE);
     }
 
-    DrawText("Test Room. Current test: Make the player (figuratively) explode by pressing [L]", 0, 0, 20, WHITE);
+    DrawText("Test Room. Current test: Hit all enemies by pressing [L]", 0, 0, 20, WHITE);
     
 
     EndDrawing();

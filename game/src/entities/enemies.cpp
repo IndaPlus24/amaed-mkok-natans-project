@@ -8,8 +8,9 @@
 #include <raymath.h>
 
 #include "gameData.h"
+#include "enemiesFunks.h"
 
-
+#define STUN_DURATION 0.4f
 
 void EnemyMovement(Enemy *enemy, Vector2 target)
 {
@@ -108,7 +109,7 @@ void EnemyUpdate(Enemy *enemy, GameData *gameData)
 {
     Player *player = &gameData->player;
     Room *room = gameData->currentRoom;
-    
+
     if (enemy->alive && enemy->stunTimer <= 0.0f)
     {
         // Move the enemy towards the target (player)
@@ -135,7 +136,7 @@ void EnemyUpdate(Enemy *enemy, GameData *gameData)
             }
         }
     }
-    else if( enemy->stunTimer > 0.0f)
+    else if (enemy->stunTimer > 0.0f)
     {
         enemy->stunTimer -= GetFrameTime(); // Update the stun timer
     }
@@ -155,7 +156,7 @@ Enemies CreateEnemies(EnemySeeder *seeder)
         enemies.enemies[i].visionAngle = 90.0f;         // 90 degrees
         enemies.enemies[i].speed = 2.0f;
         enemies.enemies[i].position = seeder->positions[i]; // Set the position of the enemy
-        enemies.enemies[i].alive = true;                    // Set the enemy as 
+        enemies.enemies[i].alive = true;                    // Set the enemy as
         enemies.enemies[i].width = 16;
         enemies.enemies[i].height = 16;
         switch (seeder->type[i])
@@ -184,17 +185,32 @@ Enemies CreateEnemies(EnemySeeder *seeder)
     return enemies;
 }
 
-void EnemyDraw(Enemy *enemy) {
+void EnemyGetHit(Enemy *enemy, float damage, Vector2 force)
+{
+    enemy->health -= damage;
+    enemy->velocity = Vector2Add(enemy->velocity, force);
+    
+    if (enemy->health <= 0) {
+        enemy->alive = false;
+        return;
+    }
+
+    enemy->stunTimer = STUN_DURATION;
+
+}
+
+void EnemyDraw(Enemy *enemy)
+{
     switch (enemy->type)
     {
     case ENEMY_MELEE:
         DrawRectangle((int)(enemy->position.x - ((enemy->width + 1) >> 1)), (int)(enemy->position.y - ((enemy->height + 1) >> 1)), (int)enemy->width, (int)enemy->height, RED);
         break;
-    
+
     case ENEMY_RANGED:
         DrawRectangle((int)(enemy->position.x - ((enemy->width + 1) >> 1)), (int)(enemy->position.y - ((enemy->height + 1) >> 1)), (int)enemy->width, (int)enemy->height, YELLOW);
         break;
-    
+
     default:
         DrawText("ERROR", (int)enemy->position.x, (int)enemy->position.y, 20, RED);
         break;

@@ -9,6 +9,7 @@ bool EnemyLineOfSight(Enemy *enemy, Player *player, Room *room);
 void EnemyUpdate(Enemy *enemy, GameData *gameData);
 void EnemyDraw(Enemy *enemy);
 Enemies CreateEnemies(EnemySeeder *seeder);
+void EnemyGetHit(Enemy *enemy, float damage, Vector2 force);
 
 
 

@@ -2,6 +2,7 @@
 
 #include "entityFunks.h"
 #include "playerFunks.h"
+#include "enemiesFunks.h"
 
 bool EntityMove(Vector2 *pos, Vector2 move, int width, int height, GameData *gameData)
 {
@@ -209,8 +210,8 @@ void AttackEntity(void *entity, void *source, GameData *gameData, float damage, 
 
     case CollisionLayers::Enemies:
     {
-        // Enemy *enemy = (Enemy *)entity;
-        // Make a relevant function to put it in - N
+        Enemy *enemy = (Enemy *)entity;
+        EnemyGetHit(enemy, damage, force);
         break;
     }
 
