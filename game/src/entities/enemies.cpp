@@ -12,7 +12,6 @@
 #include "entityFunks.h"
 #include "attackFunks.h"
 
-
 #define STUN_DURATION 0.4f
 
 void EnemyFriction(Enemy *enemy)
@@ -150,13 +149,11 @@ void EnemyNeutral(Enemy *enemy, GameData *gameData)
 
     // - enemy pathfinding (A* or Dijkstra's algorithm) to find the best path to the player
     Vector2 target = GetFlowFieldDirection((int)(enemy->position.x / tileSize), (int)(enemy->position.y / tileSize)); // Get the flow field direction for the enemy
-    // printf("Enemy position: %f, %f\n", enemy->position.x, enemy->position.y);
-    // printf("Target position: %f, %f\n", target.x, target.y);
     EnemyMovement(enemy, target, gameData);
     enemy->attackCooldownTimer += GetFrameTime(); // Update the attack cooldown timer
-    
+
     EnemyLineOfSight(enemy, player, room); // Check if the enemy can see the player
-    
+
     // Check if the enemy is aware of the player
     if (enemy->aware == false)
     {
@@ -251,7 +248,6 @@ Enemies CreateEnemies(EnemySeeder *seeder)
 
     return enemies;
 }
-
 
 void EnemyGetHit(Enemy *enemy, float damage, Vector2 force)
 {
