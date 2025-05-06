@@ -4,8 +4,8 @@
 #include "gameData.h"
 #include "input.h"
 
-void PlayerUpdate(GameData *gameData, Inputs *inputs);
+void PlayerUpdate(GameData *gameData, const Inputs *in);
 void PlayerDraw(Player *player);
-Player CreatePlayer();
+Player CreatePlayer(Vector2 spawnPos);
 
 #endif

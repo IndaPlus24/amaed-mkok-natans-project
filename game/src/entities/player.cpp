@@ -1,122 +1,107 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include <time.h>
-
 #include <raylib.h>
 #include <raymath.h>
 
-#include "player.h"
-#include "enemies.h"
-#include "input.h"
 #include "playerFunks.h"
 #include "entityFunks.h"
+#include "attackFunks.h"
 
-void PlayerMovement(Player *p, const Inputs *in)
+void PlayerFriction(Player *player)
+{
+    player->velocity = Vector2Lerp(player->velocity, (Vector2){0, 0}, player->friction * GetFrameTime());
+}
+
+void PlayerMovement(Player *player, const Inputs *in)
 {
     Vector2 dir = {0};
 
-    if (in->up == Pressed || in->up == Down)
+    if ((int)in->up & (int)ButtonState::Down)
         dir.y -= 1.0f;
-    if (in->down == Pressed || in->down == Down)
+    if ((int)in->down & (int)ButtonState::Down)
         dir.y += 1.0f;
-    if (in->left == Pressed || in->left == Down)
+    if ((int)in->left & (int)ButtonState::Down)
         dir.x -= 1.0f;
-    if (in->right == Pressed || in->right == Down)
+    if ((int)in->right & (int)ButtonState::Down)
         dir.x += 1.0f;
 
     /* decelerate when no key is held */
-    if (Vector2Length(dir) == 0.0f)
+    if (Vector2LengthSqr(dir) == 0.0f)
     {
-        p->velocity = Vector2Lerp(p->velocity, (Vector2){0, 0}, 8.0f * GetFrameTime());
-        p->direction = Vector2Normalize(p->velocity);
+        PlayerFriction(player);
         return;
     }
 
     dir = Vector2Normalize(dir);
-    p->direction = dir;
+    player->direction = dir;
 
-    p->velocity = Vector2Add(p->velocity, Vector2Scale(dir, p->acceleration * GetFrameTime()));
-
-    if (Vector2Length(p->velocity) > p->speed) p->velocity = Vector2Scale(Vector2Normalize(p->velocity), p->speed);
-}
-void PlayerAttack(Player *p, Enemies *enemies, const Inputs *in)
-{
-    bool fire = (in->a == Pressed || in->a == Down); /* hold (A) or tap */
-
-    if (!fire || p->attackCooldownTimer < p->attackCooldown)
-        return;
-
-    switch (p->type)
+    if (Vector2DotProduct(dir, player->velocity) >= 0 && Vector2LengthSqr(player->velocity) > player->speed * player->speed)
     {
-    case PLAYER_MELEE:
+        player->velocity = Vector2Scale(dir, player->speed);
+    }
+    else if (Vector2DotProduct(dir, player->velocity) < player->speed / 2)
     {
-        /* loop over every enemy and apply damage if inside range */
-        for (int i = 0; i < enemies->count; ++i)
-        {
-            Enemy *e = &enemies->enemies[i];
-
-            if (!e->alive)
-                continue;
-
-            float dist = Vector2Distance(p->position, e->position);
-
-            if (dist <= p->attackRange)
-            {
-                e->health -= p->attackDamage;
-
-                if (e->health <= 0)
-                    e->alive = false;
-            }
-        }
+        player->velocity = Vector2Add(player->velocity, Vector2Scale(dir, player->acceleration / 2 * GetFrameTime()));
+        player->velocity = Vector2ClampValue(player->velocity, 0.0f, player->speed);
     }
-    break;
-    case PLAYER_RANGED:
-        // Handle ranged attack
-        break;
+    else
+    {
+        player->velocity = Vector2Add(player->velocity, Vector2Scale(dir, player->acceleration * GetFrameTime()));
+        player->velocity = Vector2ClampValue(player->velocity, 0.0f, player->speed);
     }
-
-    p->attackCooldownTimer = 0.0f;
 }
 
-void PlayerUpdate(GameData *gameData,const Inputs *in)
+void PlayerAttack(Player *player, GameData *gameData, const Inputs *in)
+{
+    PlayerFriction(player);
+    
+    AttackUpdate(&player->attack, player->animationTime, player->position, player->direction, gameData);
+    if (player->attack.done)
+    {
+        player->animationTime = 0;
+        player->state = PlayerState::Neutral;
+    }
+}
+
+void PlayerStartAttack(Player *player, GameData *gameData, const Inputs *in)
+{
+    player->animationTime = 0;
+    player->state = PlayerState::Attack;
+    player->attack = CreateAttack(player, AttackType::testMelee);
+    PlayerAttack(player, gameData, in);
+}
+
+void PlayerUpdate(GameData *gameData, const Inputs *in)
 {
     Player *player = &gameData->player;
-    Enemies *enemies = &gameData->enemies;
-    Projectiles *projectiles = &gameData->projectiles;
-    if (!p->alive)
-        return;
-
-    if (p->stunTimer > 0.0f) /* still stunned */
-    {
-        p->stunTimer -= GetFrameTime();
-        return;
-    }
-      
-    Player *player = &gameData->player;
+    // Enemies *enemies = &gameData->enemies;
+    // Projectiles *projectiles = &gameData->projectiles;
 
     switch (player->state)
     {
     case PlayerState::Neutral:
         PlayerMovement(player, in);
+
+        if (in->a == ButtonState::Pressed)
+        {
+            PlayerStartAttack(player, gameData, in);
+        }
         break;
 
+    case PlayerState::Attack:
+        PlayerAttack(player, gameData, in);
+        break;
+    case PlayerState::Dead:
+        break;
     default:
         break;
     }
 
     Vector2 move = Vector2Scale(player->velocity, GetFrameTime());
     EntityMove(&player->position, move, player->width, player->height, gameData);
-    
-    p->attackCooldownTimer += GetFrameTime();
-    PlayerAttack(p, pool, enemies, in); /* pass enemies along */
+    player->animationTime += GetFrameTime();
 }
-  
-  void PlayerDraw(Player *player)
-{
-    DrawRectangle((int)(player->position.x - ((player->width + 1) >> 1)), (int)(player->position.y - ((player->height + 1) >> 1)), (int)player->width, (int)player->height, GREEN);
 
+void PlayerDraw(Player *player)
+{
     // A "simple" "algoritm" to translate a vector into an integer representing its angle (clockwise is positive, (0,1) is 0)
     int dir = 0;
     if (player->direction.x != 0)
@@ -137,24 +122,37 @@ void PlayerUpdate(GameData *gameData,const Inputs *in)
     {
         dir = 4;
     }
-    DrawCentre(&player->sheets[0], dir, 0, player->position);
 
-// THIS FUNCTION WAS CREATED BY COPILOT, I DID NOT WRITE IT, IT IS ONLY HERE FOR TESTING PURPOSES
-// TODO : MAKE SURE THIS FUNCTION IS WRITTEN BY A HUMAN.
-Player CreatePlayer(Vector2 spawnPos, PlayerWeaponType type){ 
+    switch (player->state)
+    {
+    case PlayerState::Neutral:
+        DrawRectangle((int)(player->position.x - ((player->width + 1) >> 1)), (int)(player->position.y - ((player->height + 1) >> 1)), (int)player->width, (int)player->height, GREEN);
+        DrawCentre(&player->sheets[0], dir, 0, player->position);
+        /* code */
+        break;
+    case PlayerState::Attack:
+        DrawRectangle((int)(player->position.x - ((player->width + 1) >> 1)), (int)(player->position.y - ((player->height + 1) >> 1)), (int)player->width, (int)player->height, ORANGE);
+        DrawCentre(&player->sheets[0], dir, 0, player->position);
+        AttackDebugDraw(&player->attack, player->position, player->direction);
+        break;
+    case PlayerState::Dead:
+        DrawRectangle((int)(player->position.x - ((player->width + 1) >> 1)), (int)(player->position.y - ((player->height + 1) >> 1)), (int)player->width, (int)player->height, DARKBLUE);
+        DrawCentre(&player->sheets[0], dir, 0, player->position);
+        break;
+    default:
+        break;
+    }
+}
+
+// This fuction has been written by a human.
+Player CreatePlayer(Vector2 spawnPos)
+{
     Player player = {0};
     player.position = spawnPos;
-    player.type = type;
-    player.speed = 2.0f;
-    player.acceleration = 1.0f;
+    player.speed = 200.0f;
+    player.acceleration = 4000.0f;
+    player.friction = 25.0f;
     player.health = 250.0f;
-    player.attackRange = 12.0f;
-    player.attackDamage = 25.0f;
-    player.attackCooldown = 0.2f;
-    player.attackCooldownTimer = 0.0f;
-    player.projectileSpeed = 500.0f;
-    player.stunTimer = 0.0f;
-    player.alive = true;
     player.width = 14;
     player.height = 15;
 
