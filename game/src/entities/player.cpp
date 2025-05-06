@@ -5,6 +5,9 @@
 #include "entityFunks.h"
 #include "attackFunks.h"
 
+#define INVINCIBILITY_DURATION 2.0f
+#define STUN_DURATION 0.4f
+
 void PlayerFriction(Player *player)
 {
     player->velocity = Vector2Lerp(player->velocity, (Vector2){0, 0}, player->friction * GetFrameTime());
@@ -52,7 +55,6 @@ void PlayerMovement(Player *player, const Inputs *in)
 void PlayerAttack(Player *player, GameData *gameData, const Inputs *in)
 {
     PlayerFriction(player);
-    
     AttackUpdate(&player->attack, player->animationTime, player->position, player->direction, gameData);
     if (player->attack.done)
     {
@@ -61,47 +63,86 @@ void PlayerAttack(Player *player, GameData *gameData, const Inputs *in)
     }
 }
 
-void PlayerStartAttack(Player *player, GameData *gameData, const Inputs *in)
+void PlayerStartAttack(Player *player, GameData *gameData, const Inputs *in, int weapon)
 {
     player->animationTime = 0;
     player->state = PlayerState::Attack;
-    player->attack = CreateAttack(player, AttackType::testMelee);
+    switch (weapon)
+    {
+    case 0:
+        player->attack = CreateAttack(player, AttackType::testMelee);
+        break;
+
+    case 1:
+        player->attack = CreateAttack(player, AttackType::testRanged);
+        break;
+    }
     PlayerAttack(player, gameData, in);
+}
+
+void PlayerNeutral(Player *player, GameData *gameData, const Inputs *in)
+{
+    PlayerMovement(player, in);
+
+    if (in->a == ButtonState::Pressed)
+    {
+        PlayerStartAttack(player, gameData, in, 0);
+    }
+    else if (in->b == ButtonState::Pressed)
+    {
+        PlayerStartAttack(player, gameData, in, 1);
+    }
 }
 
 void PlayerUpdate(GameData *gameData, const Inputs *in)
 {
     Player *player = &gameData->player;
-    // Enemies *enemies = &gameData->enemies;
-    // Projectiles *projectiles = &gameData->projectiles;
+
+    player->animationTime += GetFrameTime();
+
+    if (player->invincibilityTimer > 0)
+    {
+        player->invincibilityTimer -= GetFrameTime();
+    }
 
     switch (player->state)
     {
     case PlayerState::Neutral:
-        PlayerMovement(player, in);
-
-        if (in->a == ButtonState::Pressed)
-        {
-            PlayerStartAttack(player, gameData, in);
-        }
+        PlayerNeutral(player, gameData, in);
         break;
 
     case PlayerState::Attack:
         PlayerAttack(player, gameData, in);
         break;
-    case PlayerState::Dead:
+
+    case PlayerState::Stunned:
+        if (player->animationTime >= STUN_DURATION)
+        {
+            player->state = PlayerState::Neutral;
+            player->animationTime = 0.0f;
+            PlayerNeutral(player, gameData, in);
+        }
+        else
+        {
+            PlayerFriction(player);
+        }
         break;
-    default:
+
+    case PlayerState::Dead:
+        PlayerFriction(player);
         break;
     }
 
     Vector2 move = Vector2Scale(player->velocity, GetFrameTime());
     EntityMove(&player->position, move, player->width, player->height, gameData);
-    player->animationTime += GetFrameTime();
 }
 
 void PlayerDraw(Player *player)
 {
+    if (player->invincibilityTimer > 0.0f && ((int)(GetTime()*10.0)) & 1) {
+        return;
+    }
+
     // A "simple" "algoritm" to translate a vector into an integer representing its angle (clockwise is positive, (0,1) is 0)
     int dir = 0;
     if (player->direction.x != 0)
@@ -126,17 +167,21 @@ void PlayerDraw(Player *player)
     switch (player->state)
     {
     case PlayerState::Neutral:
-        DrawRectangle((int)(player->position.x - ((player->width + 1) >> 1)), (int)(player->position.y - ((player->height + 1) >> 1)), (int)player->width, (int)player->height, GREEN);
+        DrawRectangle((int)(player->position.x - ((player->width) >> 1)), (int)(player->position.y - ((player->height) >> 1)), (int)player->width, (int)player->height, GREEN);
         DrawCentre(&player->sheets[0], dir, 0, player->position);
         /* code */
         break;
     case PlayerState::Attack:
-        DrawRectangle((int)(player->position.x - ((player->width + 1) >> 1)), (int)(player->position.y - ((player->height + 1) >> 1)), (int)player->width, (int)player->height, ORANGE);
+        DrawRectangle((int)(player->position.x - ((player->width) >> 1)), (int)(player->position.y - ((player->height) >> 1)), (int)player->width, (int)player->height, ORANGE);
         DrawCentre(&player->sheets[0], dir, 0, player->position);
         AttackDebugDraw(&player->attack, player->position, player->direction);
         break;
+    case PlayerState::Stunned:
+        DrawRectangle((int)(player->position.x - ((player->width) >> 1)), (int)(player->position.y - ((player->height) >> 1)), (int)player->width, (int)player->height, RED);
+        DrawCentre(&player->sheets[0], dir, 0, player->position);
+        break;
     case PlayerState::Dead:
-        DrawRectangle((int)(player->position.x - ((player->width + 1) >> 1)), (int)(player->position.y - ((player->height + 1) >> 1)), (int)player->width, (int)player->height, DARKBLUE);
+        DrawRectangle((int)(player->position.x - ((player->width) >> 1)), (int)(player->position.y - ((player->height) >> 1)), (int)player->width, (int)player->height, DARKBLUE);
         DrawCentre(&player->sheets[0], dir, 0, player->position);
         break;
     default:
@@ -149,12 +194,40 @@ Player CreatePlayer(Vector2 spawnPos)
 {
     Player player = {0};
     player.position = spawnPos;
+    player.direction = Vector2{0.0f, 1.0f};
     player.speed = 200.0f;
-    player.acceleration = 4000.0f;
-    player.friction = 25.0f;
+    player.acceleration = 2000.0f;
+    player.friction = 15.0f;
     player.health = 250.0f;
     player.width = 14;
-    player.height = 15;
+    player.height = 16;
+    player.invincibilityDuration = 2.0f;
+    player.invincibilityTimer = 0;
 
     return player;
+}
+
+void PlayerGetHit(Player *player, float damage, Vector2 force)
+{
+    if (player->invincibilityTimer > 0)
+        return;
+
+    player->health -= damage;
+    player->velocity = Vector2Add(player->velocity, force);
+
+    if (player->state == PlayerState::Attack)
+    {
+        AttackForceEnd(&player->attack);
+    }
+
+    if (player->health <= 0)
+    {
+        player->state = PlayerState::Dead;
+        return;
+    }
+
+    player->state = PlayerState::Stunned;
+    player->invincibilityTimer = INVINCIBILITY_DURATION;
+
+    player->animationTime = 0.0f;
 }

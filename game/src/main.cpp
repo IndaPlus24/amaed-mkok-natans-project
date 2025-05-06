@@ -45,7 +45,14 @@ int main()
         break;
         case GameState::GameOver:
         {
-            // idk - Natan
+            // Remove this and replace it with the "real shit(tm)"
+            BeginDrawing();
+            ClearBackground(BLACK);
+            char text[] = "GAME OVER";
+            int fontSize = 50;
+            int width = MeasureText(text, fontSize);
+            DrawText(text, (GetScreenWidth() - width) / 2, (GetScreenHeight() - fontSize) / 2, fontSize, WHITE);
+            EndDrawing();
         }
         break;
         case GameState::Break:
