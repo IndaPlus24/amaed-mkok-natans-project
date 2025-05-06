@@ -5,15 +5,18 @@
 #include <raylib.h>
 #include <raymath.h>
 #include "AI.h"
+#include "attackStruct.h"
 
 // -- Macro Definitions --
-#define rayCount 16         // Number of rays to cast for line of sight
-
-// -- Forward Declarations --
-// These should be defined elsewhere.
-typedef struct Tile Tile;
+#define rayCount 16 // Number of rays to cast for line of sight
 
 // -- Type Definitions --
+
+// States
+enum class EnemyStates {
+    Neutral,
+    Attacking,
+};
 
 // Enemy types.
 typedef enum EnemyType
@@ -41,21 +44,25 @@ typedef struct Enemy
     bool aware;             // Is the enemy aware of the player?
     int health;
     int damage;
-    int visionRange;        // Range of vision (in pixels)
-    float visionAngle;      // Angle of vision (in degrees)
-    int attackRange;        // Range of attack (in pixels)
-    int attackDamage;       // Damage dealt by the enemy
-    float attackCooldown;   // Cooldown time between attacks (in seconds)
+    int visionRange;           // Range of vision (in pixels)
+    float visionAngle;         // Angle of vision (in degrees)
+    int attackRange;           // Range of attack (in pixels)
+    int attackDamage;          // Damage dealt by the enemy
+    float attackCooldown;      // Cooldown time between attacks (in seconds)
     float attackCooldownTimer; // Timer for attack cooldown
     float speed;
-    float acceleration;     // Acceleration of the enemy
-    Vector2 velocity;       // Current velocity
-    Vector2 position;       // Current position
-    Vector2 direction;      // Current facing direction
+    float acceleration; // Acceleration of the enemy
+    Vector2 velocity;   // Current velocity
+    Vector2 position;   // Current position
+    Vector2 direction;  // Current facing direction
     bool alive;
-    float stunTimer;  // Timer for stun duration
+    float stunTimer; // Timer for stun duration
     int width;
     int height;
+    EnemyStates state;
+    Attack attack;
+    float animationTime;
+    float friction;
 } Enemy;
 
 // Container for an array of enemies.
@@ -68,11 +75,10 @@ typedef struct Enemies
 // Structure for seeding enemies.
 typedef struct EnemySeeder
 {
-    Vector2* positions;      // Array of enemy starting positions
+    Vector2 *positions;      // Array of enemy starting positions
     int count;               // Number of enemies to seed
-    EnemyType* type;         // Array of enemy types
-    EnemyBehavior* behavior; // Array of enemy behaviors
+    EnemyType *type;         // Array of enemy types
+    EnemyBehavior *behavior; // Array of enemy behaviors
 } EnemySeeder;
-
 
 #endif // ENEMIES_H

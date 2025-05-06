@@ -9,10 +9,17 @@
 
 #include "gameData.h"
 #include "enemiesFunks.h"
+#include "entityFunks.h"
+#include "attackFunks.h"
 
 #define STUN_DURATION 0.4f
 
-void EnemyMovement(Enemy *enemy, Vector2 target)
+void EnemyFriction(Enemy *enemy)
+{
+    enemy->velocity = Vector2Lerp(enemy->velocity, (Vector2){0, 0}, enemy->friction * GetFrameTime());
+}
+
+void EnemyMovement(Enemy *enemy, Vector2 target, GameData *gameData)
 {
     // Calculate direction from enemy to target
     Vector2 direction = Vector2Subtract(target, enemy->position);
@@ -33,22 +40,43 @@ void EnemyMovement(Enemy *enemy, Vector2 target)
         {
             enemy->velocity = Vector2Scale(Vector2Normalize(enemy->velocity), enemy->speed);
         }
+    }
+    else {
+        EnemyFriction(enemy);
+    }
+}
 
-        // Update the enemy's position using its current velocity
-        enemy->position = Vector2Add(enemy->position, Vector2Scale(enemy->velocity, GetFrameTime()));
-    }
-}
-void EnemyAttack(Enemy *enemy, Player *player)
+void EnemyAttack(Enemy *enemy, GameData *gameData)
 {
-    // Check if the enemy is within attack range of the target
-    float distance = Vector2Distance(enemy->position, player->position);
-    if (distance <= enemy->attackRange && enemy->attackCooldownTimer >= enemy->attackCooldown)
+    EnemyFriction(enemy);
+    AttackUpdate(&enemy->attack, enemy->animationTime, enemy->position, enemy->direction, gameData);
+    if (enemy->attack.done)
     {
-        // Attack logic here
-        player->health -= enemy->damage;
-        enemy->attackCooldownTimer = 0.0f; // Reset cooldown after attack
+        enemy->animationTime = 0.0f;
+        enemy->state = EnemyStates::Neutral;
     }
 }
+
+void EnemyStartAttack(Enemy *enemy, GameData *gameData)
+{
+    switch (enemy->type)
+    {
+    case ENEMY_MELEE:
+        enemy->attack = CreateAttack(enemy, AttackType::testEnemyMelee);
+        break;
+
+    case ENEMY_RANGED:
+        enemy->attack = CreateAttack(enemy, AttackType::testEnemyRanged);
+        break;
+    case ENEMY_NONE: 
+        // Why is this a thing that exists? - N
+        break;
+    }
+    enemy->animationTime = 0.0f;
+    enemy->state = EnemyStates::Attacking;
+    EnemyAttack(enemy, gameData);
+}
+
 bool EnemyLineOfSight(Enemy *enemy, Player *player, Room *room)
 {
     // Check if the enemy has line of sight to the player
@@ -105,41 +133,66 @@ bool EnemyLineOfSight(Enemy *enemy, Player *player, Room *room)
     return canSee; // Return true if the enemy can see the player, false otherwise.
 }
 
-void EnemyUpdate(Enemy *enemy, GameData *gameData)
+void EnemyNeutral(Enemy *enemy, GameData *gameData)
 {
     Player *player = &gameData->player;
     Room *room = gameData->currentRoom;
 
-    if (enemy->alive && enemy->stunTimer <= 0.0f)
+    // Move the enemy towards the target (player)
+    // EnemyMovement target is the player position currently but will probably be changed in the future to allow for more advanced AI
+    // TODO : Implement more advanced AI for enemy movement
+    // - four types of enemy pathing, ranged (Tries to stay at a good range to hit the player), flanking (tries to cut off the player), guard (guards their target, for example a ranged unit), rush (Just charges at the player which is basically the current behavior but pathfinding is not implemented yet)
+
+    // - enemy pathfinding (A* or Dijkstra's algorithm) to find the best path to the player
+    Vector2 target = GetFlowFieldDirection((int)(enemy->position.x / tileSize), (int)(enemy->position.y / tileSize)); // Get the flow field direction for the enemy
+    EnemyMovement(enemy, target, gameData);
+    enemy->attackCooldownTimer += GetFrameTime(); // Update the attack cooldown timer
+
+    // Check if the enemy is aware of the player
+    if (enemy->aware == false)
     {
-        // Move the enemy towards the target (player)
-        // EnemyMovement target is the player position currently but will probably be changed in the future to allow for more advanced AI
-        // TODO : Implement more advanced AI for enemy movement
-        // - four types of enemy pathing, ranged (Tries to stay at a good range to hit the player), flanking (tries to cut off the player), guard (guards their target, for example a ranged unit), rush (Just charges at the player which is basically the current behavior but pathfinding is not implemented yet)
-
-        // - enemy pathfinding (A* or Dijkstra's algorithm) to find the best path to the player
-        Vector2 target = GetFlowFieldDirection((int)(enemy->position.x / tileSize), (int)(enemy->position.y / tileSize)); // Get the flow field direction for the enemy
-        EnemyMovement(enemy, target);
-        enemy->attackCooldownTimer += GetFrameTime(); // Update the attack cooldown timer
-
-        // Check if the enemy is aware of the player
-        if (enemy->aware == false)
+        EnemyLineOfSight(enemy, player, room); // Check if the enemy can see the player
+    }
+    if (enemy->aware == true) // two if statements on both values of aware is intended and not a mistake
+    {
+        float distance = Vector2Distance(enemy->position, player->position);
+        if (distance <= enemy->attackRange)
         {
-            EnemyLineOfSight(enemy, player, room); // Check if the enemy can see the player
-        }
-        if (enemy->aware == true) // two if statments on both values of aware is intended and not a mistake
-        {
-            float distance = Vector2Distance(enemy->position, player->position);
-            if (distance <= enemy->attackRange)
-            {
-                EnemyAttack(enemy, player);
-            }
+            EnemyStartAttack(enemy, gameData);
         }
     }
-    else if (enemy->stunTimer > 0.0f)
+}
+
+void EnemyUpdate(Enemy *enemy, GameData *gameData)
+{
+
+    enemy->animationTime += GetFrameTime();
+
+    if (!enemy->alive)
+    {
+        return;
+    }
+    if (enemy->stunTimer > 0.0f)
     {
         enemy->stunTimer -= GetFrameTime(); // Update the stun timer
+        return;
     }
+
+    switch (enemy->state)
+    {
+    case EnemyStates::Neutral:
+    {
+        EnemyNeutral(enemy, gameData);
+        break;
+    }
+    case EnemyStates::Attacking:
+        EnemyAttack(enemy, gameData);
+        break;
+    }
+
+    // Update the enemy's position using its current velocity
+    Vector2 move = Vector2Scale(enemy->direction, GetFrameTime());
+    EntityMove(&enemy->position, move, enemy->width, enemy->height, gameData);
 }
 
 Enemies CreateEnemies(EnemySeeder *seeder)
@@ -159,6 +212,9 @@ Enemies CreateEnemies(EnemySeeder *seeder)
         enemies.enemies[i].alive = true;                    // Set the enemy as
         enemies.enemies[i].width = 16;
         enemies.enemies[i].height = 16;
+        enemies.enemies[i].state = EnemyStates::Neutral;
+        enemies.enemies[i].animationTime = 0.0f;
+        enemies.enemies[i].friction = 15.0f;
         switch (seeder->type[i])
         {
         case ENEMY_MELEE:
@@ -189,14 +245,19 @@ void EnemyGetHit(Enemy *enemy, float damage, Vector2 force)
 {
     enemy->health -= damage;
     enemy->velocity = Vector2Add(enemy->velocity, force);
-    
-    if (enemy->health <= 0) {
+
+    if (enemy->state == EnemyStates::Attacking)
+    {
+        AttackForceEnd(&enemy->attack);
+    }
+
+    if (enemy->health <= 0.0f)
+    {
         enemy->alive = false;
         return;
     }
 
     enemy->stunTimer = STUN_DURATION;
-
 }
 
 void EnemyDraw(Enemy *enemy)

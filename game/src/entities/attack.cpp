@@ -19,7 +19,7 @@ Attack CreateAttack(void *owner, AttackType attackType)
     {
     case AttackType::testMelee:
         attack.damage = 50.0f;
-        attack.force = 100.0f;
+        attack.force = 300.0f;
         attack.targets = CollisionLayers::Enemies;
 
         attack.keyFrameCount = 5;
@@ -73,6 +73,69 @@ Attack CreateAttack(void *owner, AttackType attackType)
         attack.keyFrames[0].data = (int)ProjectilePrefabs::Default;
 
         attack.keyFrames[1].time = 0.0f;
+        attack.keyFrames[1].action = AttackAction::End;
+        attack.keyFrames[1].data = 0;
+
+        attack.hitBoxCount = 0;
+        attack.hitBoxes = nullptr; // (HitBox *)malloc(sizeof(HitBox) * attack.hitBoxCount);
+        break;
+
+    case AttackType::testEnemyMelee:
+        // Mostly same as the normal test
+        attack.damage = 20.0f;
+        attack.force = 400.0f;
+        attack.targets = CollisionLayers::Player;
+
+        attack.keyFrameCount = 5;
+        attack.keyFrames = (KeyFrame *)malloc(sizeof(KeyFrame) * attack.keyFrameCount);
+
+        // 1.0- 1.0: buildup
+
+        // 1.0 - 1.3: active
+        attack.keyFrames[0].time = 1.0f;
+        attack.keyFrames[0].action = AttackAction::ActivateHitBox;
+        attack.keyFrames[0].data = 0;
+
+        attack.keyFrames[1].time = 1.0f;
+        attack.keyFrames[1].action = AttackAction::SetFrame;
+        attack.keyFrames[1].data = 1;
+
+        // 1.3 - 1.5: recovery
+        attack.keyFrames[2].time = 1.3f;
+        attack.keyFrames[2].action = AttackAction::DeactivateHitBox;
+        attack.keyFrames[2].data = 0;
+
+        attack.keyFrames[3].time = 1.3f;
+        attack.keyFrames[3].action = AttackAction::SetFrame;
+        attack.keyFrames[3].data = 2;
+
+        // End of animation
+        attack.keyFrames[4].time = 1.5f;
+        attack.keyFrames[4].action = AttackAction::End;
+        attack.keyFrames[4].data = 0;
+
+        // Set up the HitBox
+        attack.hitBoxCount = 1;
+        attack.hitBoxes = (HitBox *)malloc(sizeof(HitBox) * attack.hitBoxCount);
+        attack.hitBoxes[0].active = false;
+        attack.hitBoxes[0].width = 20;
+        attack.hitBoxes[0].height = 20;
+        attack.hitBoxes[0].offset = Vector2{20, 0};
+        break;
+
+    case AttackType::testEnemyRanged:
+        attack.damage = 50.0f;
+        attack.force = 100.0f;
+        attack.targets = CollisionLayers::Player;
+
+        attack.keyFrameCount = 2;
+        attack.keyFrames = (KeyFrame *)malloc(sizeof(KeyFrame) * attack.keyFrameCount);
+
+        attack.keyFrames[0].time = 1.0f;
+        attack.keyFrames[0].action = AttackAction::SpawnProjectile;
+        attack.keyFrames[0].data = (int)ProjectilePrefabs::Default;
+
+        attack.keyFrames[1].time = 1.2f;
         attack.keyFrames[1].action = AttackAction::End;
         attack.keyFrames[1].data = 0;
 

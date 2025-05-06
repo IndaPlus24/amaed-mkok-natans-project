@@ -7,6 +7,7 @@
 
 enum class ProjectilePrefabs {
     Default,
+    Slow, // Same as default, except slower.
 };
 
 enum class ProjectileBehaviour {

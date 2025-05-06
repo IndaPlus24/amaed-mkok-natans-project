@@ -41,13 +41,6 @@ GameState RunGM()
         ProjectileUpdate(gameData.projectiles.list + gameData.projectiles.count + i, &gameData);
     }
 
-    if (inputs.c == ButtonState::Pressed) {
-        for (int i = 0; i < gameData.enemies.count; i++) {
-            
-        EnemyGetHit(gameData.enemies.enemies + i, 50.0f, Vector2{400.0f, 0});
-        }
-    }
-
     BeginDrawing();
     ClearBackground(BLACK);
 
@@ -66,7 +59,7 @@ GameState RunGM()
         DrawRectangle(0,0, GetScreenWidth(), GetScreenHeight(), Color{0,0,0, (unsigned char)((gameData.player.animationTime / 5) * 255)});
     }
 
-    DrawText("Test Room. Current test: Hit all enemies by pressing [L]", 0, 0, 20, WHITE);
+    DrawText("Test Room.", 0, 0, 20, WHITE);
     
 
     EndDrawing();

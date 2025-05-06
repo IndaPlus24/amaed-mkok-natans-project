@@ -10,6 +10,8 @@
 enum class AttackType {
     testMelee,
     testRanged,
+    testEnemyMelee,
+    testEnemyRanged,
 };
 
 enum class AttackAction

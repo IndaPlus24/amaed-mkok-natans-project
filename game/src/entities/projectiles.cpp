@@ -68,6 +68,24 @@ Projectile *CreateProjectile(ProjectilePrefabs prefab, GameData *gameData, void 
         ptr->hitBoxes[0].offset = Vector2Zero();
         break;
     }
+    case ProjectilePrefabs::Slow:
+    {
+        ptr->behaviour = ProjectileBehaviour::Straight;
+        ptr->speed = 500.0f;
+
+        ptr->targets = (CollisionLayers)(((int)CollisionLayers::Player | (int)CollisionLayers::Enemies) ^ (int)GetEntityType(owner, gameData));
+        ptr->pierces = 0;
+        ptr->bounces = 0;
+
+        ptr->hitBoxCount = 1;
+        ptr->hitBoxes = (HitBox *)malloc(sizeof(HitBox) * ptr->hitBoxCount);
+
+        ptr->hitBoxes[0].active = true;
+        ptr->hitBoxes[0].width = 10;
+        ptr->hitBoxes[0].height = 10;
+        ptr->hitBoxes[0].offset = Vector2Zero();
+        break;
+    }
     }
 
     return ptr;
