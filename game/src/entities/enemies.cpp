@@ -9,15 +9,12 @@
 
 #include "gameData.h"
 
-
+int frameCount = 0; // to allow for update of flow field every framecount % x == 0
 
 void EnemyMovement(Enemy *enemy, Vector2 target)
 {
-    // Calculate direction from enemy to target
-    Vector2 direction = Vector2Subtract(target, enemy->position);
-    enemy->direction = direction; // Update enemy direction
-    // Calculate distance to target
-    float distance = Vector2Length(direction);
+    Vector2 direction = target; // Direction vector from enemy to target
+    float distance = 1.0f;
 
     if (distance > 0)
     {
@@ -51,7 +48,6 @@ void EnemyAttack(Enemy *enemy, Player *player)
 bool EnemyLineOfSight(Enemy *enemy, Player *player, Room *room)
 {
     // Check if the enemy has line of sight to the player
-    // This is a simple implementation, you might want to use raycasting or other methods for more complex scenarios
     bool canSee = false;
     for (int j = -rayCount; j <= rayCount / 2; j++)
     {
@@ -108,7 +104,7 @@ void EnemyUpdate(Enemy *enemy, GameData *gameData)
 {
     Player *player = &gameData->player;
     Room *room = gameData->currentRoom;
-    
+
     if (enemy->alive && enemy->stunTimer <= 0.0f)
     {
         // Move the enemy towards the target (player)
@@ -116,15 +112,25 @@ void EnemyUpdate(Enemy *enemy, GameData *gameData)
         // TODO : Implement more advanced AI for enemy movement
         // - four types of enemy pathing, ranged (Tries to stay at a good range to hit the player), flanking (tries to cut off the player), guard (guards their target, for example a ranged unit), rush (Just charges at the player which is basically the current behavior but pathfinding is not implemented yet)
 
+        if (frameCount % 3 == 0) // Updates every 30 frammes 1/2 second at 60 fps to reduce CPU load
+        {
+            ComputeFlowField((int)(player->position.x / tileSize), (int)(player->position.y / tileSize), gameData); // Compute the flow field from the player's position
+        }
+
         // - enemy pathfinding (A* or Dijkstra's algorithm) to find the best path to the player
         Vector2 target = GetFlowFieldDirection((int)(enemy->position.x / tileSize), (int)(enemy->position.y / tileSize)); // Get the flow field direction for the enemy
+        printf("Enemy position: %f, %f\n", enemy->position.x, enemy->position.y);
+        printf("Target position: %f, %f\n", target.x, target.y);
         EnemyMovement(enemy, target);
         enemy->attackCooldownTimer += GetFrameTime(); // Update the attack cooldown timer
 
         // Check if the enemy is aware of the player
         if (enemy->aware == false)
         {
+            enemy->direction = Vector2Subtract(player->position, enemy->position); // Update the enemy direction
+            enemy->direction = Vector2Normalize(enemy->direction); // Normalize the direction vector
             EnemyLineOfSight(enemy, player, room); // Check if the enemy can see the player
+            printf("Enemy aware: %d\n", enemy->aware);
         }
         if (enemy->aware == true) // two if statments on both values of aware is intended and not a mistake
         {
@@ -135,7 +141,7 @@ void EnemyUpdate(Enemy *enemy, GameData *gameData)
             }
         }
     }
-    else if( enemy->stunTimer > 0.0f)
+    else if (enemy->stunTimer > 0.0f)
     {
         enemy->stunTimer -= GetFrameTime(); // Update the stun timer
     }
@@ -153,9 +159,9 @@ Enemies CreateEnemies(EnemySeeder *seeder)
         enemies.enemies[i].damage = 15;
         enemies.enemies[i].visionRange = 25 * tileSize; // 5 tiles
         enemies.enemies[i].visionAngle = 90.0f;         // 90 degrees
-        enemies.enemies[i].speed = 2.0f;
+        enemies.enemies[i].speed = 200.0f;
         enemies.enemies[i].position = seeder->positions[i]; // Set the position of the enemy
-        enemies.enemies[i].alive = true;                    // Set the enemy as 
+        enemies.enemies[i].alive = true;                    // Set the enemy as
         enemies.enemies[i].width = 16;
         enemies.enemies[i].height = 16;
         switch (seeder->type[i])
@@ -166,7 +172,7 @@ Enemies CreateEnemies(EnemySeeder *seeder)
             enemies.enemies[i].attackDamage = 10;
             enemies.enemies[i].attackCooldown = 0.3f; // .3 second cooldown
             enemies.enemies[i].attackCooldownTimer = 0.0f;
-            enemies.enemies[i].acceleration = 0.8f; // Acceleration of the enemy
+            enemies.enemies[i].acceleration = 200000.0f; // Acceleration of the enemy
             break;
         case ENEMY_RANGED:
             enemies.enemies[i].type = ENEMY_RANGED;
@@ -174,7 +180,7 @@ Enemies CreateEnemies(EnemySeeder *seeder)
             enemies.enemies[i].attackDamage = 8;
             enemies.enemies[i].attackCooldown = 0.8f; // .8 second cooldown
             enemies.enemies[i].attackCooldownTimer = 0.0f;
-            enemies.enemies[i].acceleration = 1.0f; // Acceleration of the enemy
+            enemies.enemies[i].acceleration = 200.0f; // Acceleration of the enemy
             break;
         default:
             break;
@@ -184,30 +190,31 @@ Enemies CreateEnemies(EnemySeeder *seeder)
     return enemies;
 }
 
-void EnemyDraw(Enemy *enemy) {
+void EnemyDraw(Enemy *enemy)
+{
     switch (enemy->type)
     {
     case ENEMY_MELEE:
         DrawRectangle((int)(enemy->position.x - ((enemy->width + 1) >> 1)), (int)(enemy->position.y - ((enemy->height + 1) >> 1)), (int)enemy->width, (int)enemy->height, RED);
         break;
-    
+
     case ENEMY_RANGED:
         DrawRectangle((int)(enemy->position.x - ((enemy->width + 1) >> 1)), (int)(enemy->position.y - ((enemy->height + 1) >> 1)), (int)enemy->width, (int)enemy->height, YELLOW);
         break;
-    
+
     default:
         DrawText("ERROR", (int)enemy->position.x, (int)enemy->position.y, 20, RED);
         break;
     }
 }
 
-EnemySeeder* CreateEnemySeeder(int count, Vector2* positions, EnemyType* type, EnemyBehavior* behavior)
+EnemySeeder *CreateEnemySeeder(int count, Vector2 *positions, EnemyType *type, EnemyBehavior *behavior)
 {
-    EnemySeeder* seeder = (EnemySeeder*)malloc(sizeof(EnemySeeder));
+    EnemySeeder *seeder = (EnemySeeder *)malloc(sizeof(EnemySeeder));
     seeder->count = count;
-    seeder->positions = (Vector2*)malloc(sizeof(Vector2) * count);
-    seeder->type = (EnemyType*)malloc(sizeof(EnemyType) * count);
-    seeder->behavior = (EnemyBehavior*)malloc(sizeof(EnemyBehavior) * count);
+    seeder->positions = (Vector2 *)malloc(sizeof(Vector2) * count);
+    seeder->type = (EnemyType *)malloc(sizeof(EnemyType) * count);
+    seeder->behavior = (EnemyBehavior *)malloc(sizeof(EnemyBehavior) * count);
 
     for (int i = 0; i < count; i++)
     {

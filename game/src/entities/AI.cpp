@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "AI.h"
+#include "gameData.h"
 
 // An extremly large value to represent infinity.
 // This is used to initialize the cost of each cell in the grid.
@@ -26,12 +27,13 @@ const int dx[4] = { 1, -1,  0,  0 };
 const int dy[4] = { 0,  0,  1, -1 };
 
 // Compute the flow field from the player's grid position using a reverse Dijkstra's algorithm.
-void ComputeFlowField(int playerGridX, int playerGridY)
+void ComputeFlowField(int playerGridX, int playerGridY, GameData *gameData)
 {
     // Initialize the cost for every cell to infinity.
     for (int i = 0; i < GRID_WIDTH; i++) {
         for (int j = 0; j < GRID_HEIGHT; j++) {
             grid[i][j].cost = INF;
+            grid[i][j].walkable = gameData->currentRoom->tiles[i + j * gameData->currentRoom->width].walkable;
         }
     }
     
