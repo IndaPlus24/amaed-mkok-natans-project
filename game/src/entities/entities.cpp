@@ -132,22 +132,25 @@ std::unordered_set<void *> GetEntitiesInArea(Vector2 pos, int width, int height,
     // It targets a player
     if ((int)layers & (int)CollisionLayers::Player)
     {
-        // Either it is able to target self of the target isn't self
-        if ((((int)layers & (int)CollisionLayers::Self || self != &gameData->player)))
+        if (self == &gameData->player && !((int)layers & (int)CollisionLayers::Self))
         {
-            // It either targets corpses or the target isn't a corpse
-            if (((int)layers & (int)CollisionLayers::Corpses && gameData->player.state != PlayerState::Dead))
+            // Don't target self unless you want to
+        }
+        else if (gameData->player.state == PlayerState::Dead && !((int)layers & (int)CollisionLayers::Corpses))
+        {
+            // Don't target corpses unless you want to
+        }
+        else
+        {
+            float px0 = gameData->player.position.x - gameData->player.width / 2;
+            float px1 = px0 + gameData->player.width;
+            float py0 = gameData->player.position.y - gameData->player.height / 2;
+            float py1 = py0 + gameData->player.height;
+            // The standard overlapping square check
+            if (px1 > x0 && px0 < x1 && py1 > y0 && py0 < y1)
             {
-                float px0 = gameData->player.position.x - gameData->player.width / 2;
-                float px1 = px0 + gameData->player.width;
-                float py0 = gameData->player.position.y - gameData->player.height / 2;
-                float py1 = py0 + gameData->player.height;
-                // The standard overlapping square check
-                if (px1 > x0 && px0 < x1 && py1 > y0 && py0 < y1)
-                {
-                    // It overlaps
-                    hashSet.insert((void *)&gameData->player);
-                }
+                // It overlaps
+                hashSet.insert((void *)&gameData->player);
             }
         }
     }
@@ -227,11 +230,11 @@ Vector2 GetEntityPosition(const void *entity, const GameData *gameData)
     switch (GetEntityType(entity, gameData))
     {
     case CollisionLayers::Player:
-        return ((Player *) entity)->position;
+        return ((Player *)entity)->position;
     case ::CollisionLayers::Enemies:
-        return ((Enemy *) entity)->position;
+        return ((Enemy *)entity)->position;
     case CollisionLayers::Projectiles:
-        return ((Projectile *) entity)->position;
+        return ((Projectile *)entity)->position;
     default:
         return Vector2{0, 0};
     }

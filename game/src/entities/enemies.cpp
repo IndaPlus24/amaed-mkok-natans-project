@@ -27,16 +27,15 @@ void EnemyMovement(Enemy *enemy, Vector2 target, GameData *gameData)
 
     if (distance > 0)
     {
+        direction = Vector2Normalize(direction);
+
         enemy->direction = direction; // Update enemy direction
 
         // accelerate in the direction of the target
         enemy->velocity = Vector2Add(enemy->velocity, Vector2Scale(direction, enemy->acceleration * GetFrameTime()));
 
         // Clamp velocity to the enemy's maximum speed
-        if (Vector2Length(enemy->velocity) >= enemy->speed)
-        {
-            enemy->velocity = Vector2Scale(Vector2Normalize(enemy->velocity), enemy->speed);
-        }
+        enemy->velocity = Vector2ClampValue(enemy->velocity, 0.0f, enemy->speed);
     }
     else
     {
@@ -64,6 +63,7 @@ void EnemyStartAttack(Enemy *enemy, GameData *gameData)
         break;
 
     case ENEMY_RANGED:
+        enemy->direction = Vector2Normalize(Vector2Subtract(gameData->player.position, enemy->position));
         enemy->attack = CreateAttack(enemy, AttackType::testEnemyRanged);
         break;
     case ENEMY_NONE:
@@ -179,6 +179,11 @@ void EnemyUpdate(Enemy *enemy, GameData *gameData)
     if (enemy->stunTimer > 0.0f)
     {
         enemy->stunTimer -= GetFrameTime(); // Update the stun timer
+
+        EnemyFriction(enemy);
+        Vector2 move = Vector2Scale(enemy->velocity, GetFrameTime());
+        EntityMove(&enemy->position, move, enemy->width, enemy->height, gameData);
+        
         return;
     }
 
@@ -195,7 +200,7 @@ void EnemyUpdate(Enemy *enemy, GameData *gameData)
     }
 
     // Update the enemy's position using its current velocity
-    Vector2 move = Vector2Scale(enemy->direction, GetFrameTime());
+    Vector2 move = Vector2Scale(enemy->velocity, GetFrameTime());
     EntityMove(&enemy->position, move, enemy->width, enemy->height, gameData);
     frameCount++;
 }
@@ -212,21 +217,21 @@ Enemies CreateEnemies(EnemySeeder *seeder)
         enemies.enemies[i].damage = 15;
         enemies.enemies[i].visionRange = 25 * tileSize; // 5 tiles
         enemies.enemies[i].visionAngle = 90.0f;         // 90 degrees
-        enemies.enemies[i].speed = 200.0f;
+        enemies.enemies[i].speed = 100.0f;
         enemies.enemies[i].position = seeder->positions[i]; // Set the position of the enemy
         enemies.enemies[i].alive = true;                    // Set the enemy as
         enemies.enemies[i].width = 16;
         enemies.enemies[i].height = 16;
         enemies.enemies[i].state = EnemyStates::Neutral;
         enemies.enemies[i].animationTime = 0.0f;
-        enemies.enemies[i].friction = 5.0f;
+        enemies.enemies[i].friction = 25.0f;
         float r = GetRandomValue(0, 7) / 4 * PI;
         enemies.enemies[i].direction = Vector2{cos(r), sin(r)};
         switch (seeder->type[i])
         {
         case ENEMY_MELEE:
             enemies.enemies[i].type = ENEMY_MELEE;
-            enemies.enemies[i].attackRange = 0.5f * tileSize; // .5 tile
+            enemies.enemies[i].attackRange = 1.0f * tileSize; // 1.0 tile
             enemies.enemies[i].attackDamage = 10;
             enemies.enemies[i].attackCooldown = 0.3f; // .3 second cooldown
             enemies.enemies[i].attackCooldownTimer = 0.0f;
@@ -264,6 +269,8 @@ void EnemyGetHit(Enemy *enemy, float damage, Vector2 force)
         return;
     }
 
+    enemy->animationTime = 0.0f;
+    enemy->state = EnemyStates::Neutral;
     enemy->stunTimer = STUN_DURATION;
 }
 
@@ -272,11 +279,11 @@ void EnemyDraw(Enemy *enemy)
     switch (enemy->type)
     {
     case ENEMY_MELEE:
-        DrawRectangle((int)(enemy->position.x - ((enemy->width + 1) >> 1)), (int)(enemy->position.y - ((enemy->height + 1) >> 1)), (int)enemy->width, (int)enemy->height, RED);
+        DrawRectangle((int)(enemy->position.x - ((enemy->width) >> 1)), (int)(enemy->position.y - ((enemy->height) >> 1)), (int)enemy->width, (int)enemy->height, RED);
         break;
 
     case ENEMY_RANGED:
-        DrawRectangle((int)(enemy->position.x - ((enemy->width + 1) >> 1)), (int)(enemy->position.y - ((enemy->height + 1) >> 1)), (int)enemy->width, (int)enemy->height, PURPLE);
+        DrawRectangle((int)(enemy->position.x - ((enemy->width) >> 1)), (int)(enemy->position.y - ((enemy->height) >> 1)), (int)enemy->width, (int)enemy->height, PURPLE);
         break;
 
     default:
@@ -286,13 +293,15 @@ void EnemyDraw(Enemy *enemy)
 
     if (!enemy->alive)
     {
-        DrawCircle(enemy->position.x, enemy->position.x, enemy->width / 2, BLACK);
+        DrawCircle((int)enemy->position.x, (int)enemy->position.y, enemy->width / 2, BLACK);
         return;
     }
-
-    if (enemy->aware)
+    else if (enemy->stunTimer > 0.0f) {
+        DrawCircle((int)enemy->position.x, (int)enemy->position.y, enemy->width / 3, WHITE);
+    }
+    else if (enemy->aware)
     {
-        DrawCircle(enemy->position.x, enemy->position.x, enemy->width / 3, YELLOW);
+        DrawCircle((int)enemy->position.x, (int)enemy->position.y, enemy->width / 3, YELLOW);
     }
 
     switch (enemy->state)
@@ -300,7 +309,7 @@ void EnemyDraw(Enemy *enemy)
     case EnemyStates::Neutral:
         break;
     case EnemyStates::Attacking:
-        DrawCircle(enemy->position.x, enemy->position.x, enemy->width / 2, BLUE);
+        DrawCircle((int)enemy->position.x, (int)enemy->position.y, enemy->width / 2, BLUE);
         AttackDebugDraw(&enemy->attack, enemy->position, enemy->direction);
         break;
     }

@@ -48,13 +48,10 @@ GameState RunGM()
     {
         EnemyUpdate(&gameData.enemies.enemies[i], &gameData);
     }
-    // EnemyUpdate(&gameData.enemies.enemies[0], &gameData); // - Assuming this is a mistake - N
 
     for (int i = - gameData.projectiles.count; i < 0; i++) {
         ProjectileUpdate(gameData.projectiles.list + gameData.projectiles.count + i, &gameData);
     }
-
-    EnemyUpdate(&gameData.enemies.enemies[0], &gameData);
 
     BeginDrawing();
     ClearBackground(BLACK);
