@@ -14,10 +14,10 @@ bool EntityMove(Vector2 *pos, Vector2 move, int width, int height, GameData *gam
         int sign = move.x > 0 ? 1 : -1;
         float margin = floorf(sign * ((float)width) / 2);
 
-        int y0 = (int)((pos->y - height / 2) / tileSize);      // y start
-        int y1 = (int)((pos->y + height / 2 - 1) / tileSize);  // y end
-        int x0 = (int)((pos->x) / tileSize);                   // x start
-        int x1 = (int)((pos->x + move.x + margin) / tileSize); // x limit
+        int y0 = (int)floor((pos->y - height / 2) / tileSize);      // y start
+        int y1 = (int)floor((pos->y + height / 2 - 1) / tileSize);  // y end
+        int x0 = (int)floor((pos->x) / tileSize);                   // x start
+        int x1 = (int)floor((pos->x + move.x + margin) / tileSize); // x limit
 
         // Did it hit a wall?
 
@@ -54,10 +54,10 @@ bool EntityMove(Vector2 *pos, Vector2 move, int width, int height, GameData *gam
         int sign = move.y > 0 ? 1 : -1;
         float margin = floorf(sign * ((float)height) / 2);
 
-        int y0 = (int)((pos->y) / tileSize);                   // y start
-        int y1 = (int)((pos->y + move.y + margin) / tileSize); // y limit
-        int x0 = (int)((pos->x - width / 2) / tileSize);       // x start
-        int x1 = (int)((pos->x + width / 2 - 1) / tileSize);   // x end
+        int y0 = (int)floor((pos->y) / tileSize);                   // y start
+        int y1 = (int)floor((pos->y + move.y + margin) / tileSize); // y limit
+        int x0 = (int)floor((pos->x - width / 2) / tileSize);       // x start
+        int x1 = (int)floor((pos->x + width / 2 - 1) / tileSize);   // x end
 
         // Did it hit a wall?
 

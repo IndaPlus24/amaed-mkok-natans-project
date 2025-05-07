@@ -35,6 +35,7 @@ Door CreateDoor(int fromId, int toId)
 void DrawMap(const Map &map)
 {
     // I don't really get what this is supposed to do.
+    // I think it is suppose to do a _map_. You know, like the piece of paper. I could be wrong though. - N
 }
 
 Room* CreateMap(int floors, int roomsPerFloor, int width, int height, int floorSwitch)
@@ -146,15 +147,19 @@ void RoomDraw(Room *room)
 // TEMPORARY FUNCTION
 Tile GetTile(Room *room, int x, int y)
 {
-    Tile tile = room->tiles[x + y * room->width];
-    /*
-    if (x < 1 || x >= room->width - 1 || y < 1 || y >= room->height - 1)
+    // Make sure no one thinks you can walk across the tiles outside.
+    if (x < 0 || x >= room->width || y < 0 || y >= room->height)
     {
+        Tile tile;
         tile.walkable = false;
+        tile.isDoor = false;
+        tile.isWall = true;
+        
+        return tile;
     }
-    else
-    {
-        tile.walkable = true;
-    }*/
+
+    Tile tile = room->tiles[x + y * room->width];
+
+    
     return tile;
 }
