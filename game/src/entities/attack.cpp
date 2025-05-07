@@ -9,12 +9,12 @@ Attack CreateAttack(void *owner, AttackType attackType)
 {
     Attack attack;
     attack.currentFrame = 0;
-    // attack.lastCheck = 0;
     attack.currentFrame = 0;
     attack.currentKeyIndex = 0;
     attack.done = false;
     attack.owner = owner;
-    attack.hits = std::unordered_set<void *>();
+    attack.hits = new std::unordered_set<void *>();
+
     switch (attackType)
     {
     case AttackType::testMelee:
@@ -158,7 +158,7 @@ void ThingThatEvaluatesHitBoxes(const HitBox *hitBox, Attack *attack, Vector2 po
 
     for (std::unordered_set<void *>::iterator itr = newHits.begin(); itr != newHits.end(); ++itr)
     {
-        if (attack->hits.insert(*itr).second)
+        if (attack->hits->insert(*itr).second)
         {
             // It Hit!
             AttackEntity(*itr, attack->owner, gameData, attack->damage, Vector2Scale(dir, attack->force));
@@ -180,11 +180,11 @@ void ThingThatEvaluatesKeyFrames(const KeyFrame *keyFrame, Attack *attack, Vecto
         break;
 
     case AttackAction::SpawnProjectile:
-        CreateProjectile((ProjectilePrefabs)keyFrame->data, gameData, attack->owner, dir);
+        CreateProjectile((ProjectilePrefabs)keyFrame->data, gameData, attack->owner, dir, attack->damage, attack->force);
         break;
 
     case AttackAction::ResetHits:
-        attack->hits.clear();
+        attack->hits->clear();
         break;
 
     case AttackAction::SetFrame:
@@ -265,5 +265,6 @@ void AttackForceEnd(Attack *attack)
     {
         free(attack->hitBoxes);
     }
+    attack->hits->~unordered_set();
     attack->done = true;
 }

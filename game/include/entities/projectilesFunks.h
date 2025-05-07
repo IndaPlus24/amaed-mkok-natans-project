@@ -5,7 +5,7 @@
 
 // Behold: the lifecycle of a projectile
 
-Projectile *CreateProjectile(ProjectilePrefabs prefab, GameData *gameData, void *owner, Vector2 direction);
+Projectile *CreateProjectile(ProjectilePrefabs prefab, GameData *gameData, void *owner, Vector2 direction, float damage, float force);
 
 void ProjectileUpdate(Projectile *projectile, GameData *gameData);
 

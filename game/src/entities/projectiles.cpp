@@ -38,13 +38,16 @@ void ThingThatEvaluatesProjectileHitBoxes(const HitBox *hitBox, Projectile *proj
     }
 }
 
-Projectile *CreateProjectile(ProjectilePrefabs prefab, GameData *gameData, void *owner, Vector2 direction)
+Projectile *CreateProjectile(ProjectilePrefabs prefab, GameData *gameData, void *owner, Vector2 direction, float damage, float force)
 {
     Projectile *ptr = ProjectilesPush(gameData);
 
     ptr->owner = owner;
     ptr->position = GetEntityPosition(owner, gameData);
     ptr->direction = direction;
+
+    ptr->damage = damage;
+    ptr->force = force;
 
     ptr->hits = new std::unordered_set<void *>();
 

@@ -44,7 +44,7 @@ typedef struct KeyFrame
 typedef struct Attack
 {
     void *owner; // Make sure we don't hit the owner (unless we want to)
-    std::unordered_set<void *> hits;  // Make sure we don't hit the same target multiple times (unless we want to)
+    std::unordered_set<void *> *hits;  // Make sure we don't hit the same target multiple times (unless we want to)
 
     CollisionLayers targets;
 
