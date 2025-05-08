@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <string>
 #include <fstream>
+#include <sstream>
 
 
 static const std::unordered_map<EnemyType, int>  ScoreMap = { // Returns a godtyckligt value to the different enemy types
@@ -11,13 +12,9 @@ static const std::unordered_map<EnemyType, int>  ScoreMap = { // Returns a godty
     {EnemyType::ENEMY_NONE, 0}
 };
 
-struct ScoreEntry {
-    std::string initials;
-    int score;
-};
+extern char* initials = "AAA";
 
-
-int score = 0;
+extern int score = 0;
 
 int CountDigits() {
     if (score == 0) return 4;
@@ -50,8 +47,25 @@ void ScoreAdd() {
     std::ofstream file("scores.txt");
     if (!file.is_open()) return;
 
-    file << entry.initials << " " << entry.score << "\n";
+    file << initials << " " << score << "\n";
 
     file.close();
+}
+
+std::vector<ScoreEntry> GetHighScores(){
+    std::vector<ScoreEntry> scores;
+    std::ifstream file("saves/scores.txt");
+    std::string line;
+
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        ScoreEntry entry;
+        iss >> entry.initials >> entry.score;
+        if (!entry.initials.empty()) {
+            scores.push_back(entry);
+        }
+    }
+
+    return scores;
 }
 

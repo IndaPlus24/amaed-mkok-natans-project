@@ -9,6 +9,7 @@
 #include "playerFunks.h"
 #include "projectilesFunks.h"
 #include "enemiesFunks.h"
+#include "score.h"
 
 GameData gameData;
 // Temporary variable, get rid off it when a proper map has been implemented. - N
@@ -34,6 +35,7 @@ void InitGM(dataGM initdata)
     gameData.projectiles.count = 0;
     gameData.projectiles.capacity = 16;
     gameData.projectiles.list = (Projectile *) malloc(sizeof(Projectile) * gameData.projectiles.capacity);
+    Font arcadeFont = LoadFont("assets/PressStart2P-Regular.ttf");
 }
 
 GameState RunGM()
@@ -61,6 +63,7 @@ GameState RunGM()
     PlayerDraw(&gameData.player);
     EnemyDraw(&gameData.enemies.enemies[0]);
     EnemyDraw(&gameData.enemies.enemies[1]);
+    ScoreDraw();
 
 
     for (int i = 0; i <  gameData.projectiles.count; i++) {

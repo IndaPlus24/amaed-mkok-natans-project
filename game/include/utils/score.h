@@ -7,6 +7,7 @@
 #include "enemiesStruct.h"
 
 extern int score;
+
 struct ScoreEntry {
     std::string initials;
     int score;
@@ -23,7 +24,7 @@ int GetScore();
 // Returns the top score from the high score list
 int GetHighScore();
 
-// Renders score on screen
+// Renders score on screen in left bottom screen when in-game
 void ScoreDraw();
 
 // Returns a formatted score string for drawing
@@ -32,7 +33,7 @@ const char* GetFormatScore();
 // Returns the list of high scores
 std::vector<ScoreEntry> GetHighScores();
 
-// Adds a score entry with initials to the high score list
+// Adds a score entry with initials to the high score list (Saves it)
 void ScoreAdd(const std::string& initials, int score);
 
 //Loads the existing scores

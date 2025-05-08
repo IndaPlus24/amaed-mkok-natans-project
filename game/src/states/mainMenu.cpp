@@ -71,11 +71,15 @@ void navigateFuckedUpAndEvilMenuTree()
                 // Exit
                 changeState = GameState::Break;
                 break;
+            case 3:
+                changeState = GameState::HighScore;
+                break;
+
             }
         }
         else
         {
-            (navigate(3, inputs));
+            (navigate(4, inputs));
         }
         break;
     // Options: change volume, back
@@ -138,7 +142,8 @@ void drawFuckedUpAndEvilMenuTree()
         options[0] = "Start";
         options[1] = "Inställningar";
         options[2] = "Avsluta";
-        amount = 3;
+        options[3] = "High Scores";        
+        amount = 4;
         break;
 
     case 1:
@@ -156,6 +161,8 @@ GameState runMM()
 
     switch (changeState)
     {
+    case GameState::HighScore:
+        return GameState::HighScore;
     case GameState::Break:
         return GameState::Break;
     case GameState::GameMaster:

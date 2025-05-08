@@ -11,6 +11,7 @@
 #include "enemiesFunks.h"
 #include "entityFunks.h"
 #include "attackFunks.h"
+#include "score.h"
 
 #define STUN_DURATION 0.4f
 
@@ -266,6 +267,8 @@ void EnemyGetHit(Enemy *enemy, float damage, Vector2 force)
     if (enemy->health <= 0.0f)
     {
         enemy->alive = false;
+        //increment score here
+        IncrementScore(enemy->type);
         return;
     }
 
