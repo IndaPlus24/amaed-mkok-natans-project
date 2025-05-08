@@ -50,8 +50,8 @@ Map CreateMap(int floors, int roomsPerFloor, int width, int height, int floorSwi
         {
             if (i >= floorSwitch)
             {
-                int entryX = previousDoor->posX;
-                int entryY = previousDoor->posY;
+                int entryX = previousDoor ? previousDoor->posX : width  / 2;
+                int entryY = previousDoor ? previousDoor->posY : height / 2;
                 if (previousDoor->posX < 0)
                 {
                     entryX = width - 2;
@@ -374,9 +374,6 @@ Room BSP(int id, int width, int height, int iterations, Door *previousDoor)
     room.doors[1] = CreateDoor(id, dx, dy);
     room.tiles[room.doors[1].posX + room.doors[1].posY * width].door = &room.doors[1];
     room.tiles[room.doors[1].posX + room.doors[1].posY * width].walkable = true;
-    int idx = dx + dy * width;
-    room.tiles[idx].door = &room.doors[1];
-    room.tiles[idx].walkable = true;
 
     freeChamberTree(root);
     return room;
