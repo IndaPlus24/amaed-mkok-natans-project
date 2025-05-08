@@ -6,7 +6,6 @@
 #include "enemiesFunks.h"
 #include "gameData.h"
 
-
 // TEMPORARY FUNCTION
 Room CreateRoom(int id, int width, int height, RoomType type)
 {
@@ -22,17 +21,25 @@ Room CreateRoom(int id, int width, int height, RoomType type)
 }
 
 // TEMPORARY FUNCTION
-Door CreateDoor(Door* fromDoor, int roomId, int posX, int posY)
+Door CreateDoor(Door *fromDoor, int roomId, int posX, int posY)
 {
     Door door;
     door.fromRoomId = roomId;
     door.posX = posX;
     door.posY = posY;
-    ConnectRooms(fromDoor, &door);
+    if (fromDoor){
+        ConnectRooms(fromDoor, &door);
+    }
     return door;
 };
-void ConnectRooms(Door* door1, Door* door2)
+void ConnectRooms(Door *door1, Door *door2)
 {
+    printf("Connecting doors %d and %d\n", door1->fromRoomId, door2->fromRoomId);
+    if(door1 == nullptr || door2 == nullptr)
+    {
+        printf("One of the doors is null\n");
+        return;
+    }
     // connect the two doors
     door1->linkedDoor = door2;
     door2->linkedDoor = door1;
@@ -47,37 +54,38 @@ void DrawMap(const Map &map)
     // I think it is suppose to do a _map_. You know, like the piece of paper. I could be wrong though. - N
 }
 
-Room* CreateMap(int floors, int roomsPerFloor, int width, int height, int floorSwitch)
+Room *CreateMap(int floors, int roomsPerFloor, int width, int height, int floorSwitch)
 {
     Room *map = (Room *)malloc(sizeof(Room) * floors * roomsPerFloor);
     for (int i = 0; i < floors; i++)
     {
         for (int j = 0; j < roomsPerFloor; j++)
         {
-            if(i >= floorSwitch)
+            if (i >= floorSwitch)
             {
-                //map[i * roomsPerFloor + j] = DrunkardsWalk(i * roomsPerFloor + j, width, height, 15, map[i * roomsPerFloor + j - 1].doors[1]);
+                // map[i * roomsPerFloor + j] = DrunkardsWalk(i * roomsPerFloor + j, width, height, 15, map[i * roomsPerFloor + j - 1].doors[1]);
             }
             else
             {
                 map[i * roomsPerFloor + j] = CreateRoom(i * roomsPerFloor + j, width, height, RoomType::FightRoom);
             }
         }
-        
     }
-    
+
     return map;
 }
 
-Room DrunkardsWalk(int startX, int startY, int id, int width, int height, int iterations, Door* previousDoor)
+Room DrunkardsWalk(int startX, int startY, int id, int width, int height, int iterations, Door *previousDoor)
 {
-    int possibleDoors[25][2][4]; // 100 first locations visited by the drunkard that are guaranteed to be walkable. 0 = Up, 1 = Down, 2 = Left, 3 = Right
+    int possibleDoors[25][2]; // 100 first locations visited by the drunkard that are guaranteed to be walkable. 0 = Up, 1 = Down, 2 = Left, 3 = Right
     int possibleDoorsCount = 0;
+
     Room room = CreateRoom(id, width, height, RoomType::FightRoom);
     bool hasFoundAOuterWall = false;
     for (int i = 0; i < width * height; i++)
     {
         room.tiles[i].walkable = false;
+        room.tiles[i].door = nullptr;
     }
 
     for (int i = 0; i < iterations; i++)
@@ -107,37 +115,51 @@ Room DrunkardsWalk(int startX, int startY, int id, int width, int height, int it
                 break;
             }
             // Out of bounds check
-            if (posX < 0)
+            if (posX < 1)
             {
+                if (possibleDoorsCount < 25)
+                {
+                    possibleDoors[possibleDoorsCount][0] = posX;
+                    possibleDoors[possibleDoorsCount][1] = posY;
+                    possibleDoorsCount++;
+                    hasFoundAOuterWall = true;
+                }
                 posX++;
-                possibleDoors[possibleDoorsCount][0][2] = posX;
-                possibleDoors[possibleDoorsCount][1][2] = posY;
-                possibleDoorsCount++;
-                hasFoundAOuterWall = true;
             }
-            if (posX >= width)
+            if (posX >= width-1)
             {
+                if (possibleDoorsCount < 25)
+                {
+                    possibleDoors[possibleDoorsCount][0] = posX;
+                    possibleDoors[possibleDoorsCount][1] = posY;
+                    possibleDoorsCount++;
+                    hasFoundAOuterWall = true;
+                }
                 posX--;
-                possibleDoors[possibleDoorsCount][0][3] = posX;
-                possibleDoors[possibleDoorsCount][1][3] = posY;
-                possibleDoorsCount++;
-                hasFoundAOuterWall = true;
             }
-            if (posY < 0)
+            if (posY < 1
+            )
             {
+                if (possibleDoorsCount < 25)
+                {
+                    possibleDoors[possibleDoorsCount][0] = posX;
+                    possibleDoors[possibleDoorsCount][1] = posY;
+                    possibleDoorsCount++;
+                    hasFoundAOuterWall = true;
+                }
                 posY++;
-                possibleDoors[possibleDoorsCount][0][1] = posX;
-                possibleDoors[possibleDoorsCount][1][1] = posY;
-                possibleDoorsCount++;
-                hasFoundAOuterWall = true;
             }
-            if (posY >= height)
+            if (posY >= height-1)
             {
+                if (possibleDoorsCount < 25)
+                {
+                    possibleDoors[possibleDoorsCount][0] = posX;
+                    possibleDoors[possibleDoorsCount][1] = posY;
+                    possibleDoorsCount++;
+                    hasFoundAOuterWall = true;
+                }
                 posY--;
-                possibleDoors[possibleDoorsCount][0][0] = posX;
-                possibleDoors[possibleDoorsCount][1][0] = posY;
-                possibleDoorsCount++;
-                hasFoundAOuterWall = true;
+                
             }
 
             // Set the tile to walkable
@@ -149,13 +171,19 @@ Room DrunkardsWalk(int startX, int startY, int id, int width, int height, int it
             i--;
         }
         // we have found an outer wall, we can add a door to the room.
-        room.doors[0] = CreateDoor(previousDoor, id, possibleDoors[random()%possibleDoorsCount][0][random()%4], possibleDoors[random()%possibleDoorsCount][1][random()%4]);
-        room.doors[1] = CreateDoor(previousDoor, id, possibleDoors[random()%possibleDoorsCount][0][random()%4], possibleDoors[random()%possibleDoorsCount][1][random()%4]); // door index 1 is the exit, linmking it to the previous room is fixed if there is a next one since that function does the same as this one
     }
+    if (previousDoor != nullptr) // this should only happen if the room is the first one, but in the case that it isn't it shouldn't crash, i hope.
+    {
+        // Connect the doors
+        room.doors[0] = CreateDoor(previousDoor, id, possibleDoors[random() % possibleDoorsCount][0], possibleDoors[random() % possibleDoorsCount][1]);
+        room.tiles[room.doors[0].posX + room.doors[0].posY * width].door = &room.doors[0];
+    }
+    room.doors[1] = CreateDoor(previousDoor, id, possibleDoors[random()%possibleDoorsCount][0], possibleDoors[random()%possibleDoorsCount][1]); // door index 1 is the exit, linmking it to the previous room is fixed if there is a next one since that function does the same as this one
+    room.tiles[room.doors[1].posX + room.doors[1].posY * width].door = &room.doors[0];
     return room;
 }
 // Creates a room using the BSP algorithm
-Room BSP(int id, int width, int height, int iterations, Door* previousDoor = nullptr)
+Room BSP(int id, int width, int height, int iterations, Door *previousDoor = nullptr)
 {
     Room room = CreateRoom(id, width, height, RoomType::FightRoom);
     for (int i = 0; i < width * height; i++)
@@ -165,13 +193,12 @@ Room BSP(int id, int width, int height, int iterations, Door* previousDoor = nul
 
     for (int i = 0; i < iterations; i++)
     {
-
     }
-        
 
     return room;
 }
-void BSPSpliterFunction(int minChamberWidth, int minChamberHeight, Room* room){
+void BSPSpliterFunction(int minChamberWidth, int minChamberHeight, Room *room)
+{
     if (rand() % 2 == 0) // Horizontal split
     {
         int splitX = rand() % (room->width - minChamberWidth) + minChamberWidth;
@@ -205,7 +232,7 @@ void RoomDraw(Room *room)
             if (GetTile(room, x, y).door != nullptr)
             {
                 DrawRectangle(x * tileSize, y * tileSize, tileSize, tileSize, RED);
-            } 
+            }
         }
     }
 }
@@ -217,6 +244,5 @@ Tile GetTile(Room *room, int x, int y)
 
     Tile tile = room->tiles[x + y * room->width];
 
-    
     return tile;
 }

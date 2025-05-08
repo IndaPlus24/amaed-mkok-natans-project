@@ -27,7 +27,7 @@ void InitGM(dataGM initdata)
 
     gameData.player.sheets[0] = LoadSpriteSheet("assets/sprites/n0llan.png", 8, 1);
 
-    a = DrunkardsWalk(0,30,0, 50, 30, 150);
+    a = DrunkardsWalk(30,25,0, 50, 30, 150, nullptr);
     
     gameData.currentRoom = &a;
     
@@ -42,7 +42,6 @@ GameState RunGM()
     Inputs inputs = GetInputs();
 
     PlayerUpdate(&gameData, &inputs);
-
     //UPDATES ALL ENEMIES   
     for (int i = 0; i < gameData.enemies.count; i++)
     {
@@ -59,8 +58,10 @@ GameState RunGM()
     RoomDraw(gameData.currentRoom);
     
     PlayerDraw(&gameData.player);
-    EnemyDraw(&gameData.enemies.enemies[0]);
-    EnemyDraw(&gameData.enemies.enemies[1]);
+    for(int i = 0; i < gameData.enemies.count; i++)
+    {
+        EnemyDraw(&gameData.enemies.enemies[i]);
+    }
 
 
     for (int i = 0; i <  gameData.projectiles.count; i++) {

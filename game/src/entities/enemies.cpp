@@ -134,7 +134,7 @@ void EnemyNeutral(Enemy *enemy, GameData *gameData)
 {
     Player *player = &gameData->player;
     Room *room = gameData->currentRoom;
-
+    
     // Move the enemy towards the target (player)
     // EnemyMovement target is the player position currently but will probably be changed in the future to allow for more advanced AI
     // TODO : Implement more advanced AI for enemy movement
@@ -149,7 +149,7 @@ void EnemyNeutral(Enemy *enemy, GameData *gameData)
     Vector2 target = GetFlowFieldDirection((int)(enemy->position.x / tileSize), (int)(enemy->position.y / tileSize)); // Get the flow field direction for the enemy
     EnemyMovement(enemy, target, gameData);
     enemy->attackCooldownTimer += GetFrameTime(); // Update the attack cooldown timer
-
+    
     EnemyLineOfSight(enemy, player, room); // Check if the enemy can see the player
 
     // Check if the enemy is aware of the player
@@ -186,7 +186,7 @@ void EnemyUpdate(Enemy *enemy, GameData *gameData)
         
         return;
     }
-
+    
     switch (enemy->state)
     {
     case EnemyStates::Neutral:
@@ -198,10 +198,12 @@ void EnemyUpdate(Enemy *enemy, GameData *gameData)
         EnemyAttack(enemy, gameData);
         break;
     }
-
+    
     // Update the enemy's position using its current velocity
     Vector2 move = Vector2Scale(enemy->velocity, GetFrameTime());
+    
     EntityMove(&enemy->position, move, enemy->width, enemy->height, gameData);
+    
     frameCount++;
 }
 
