@@ -22,13 +22,11 @@ int frameCount = 0; // to allow for update of flow field every framecount % x ==
 
 void EnemyMovement(Enemy *enemy, Vector2 target, GameData *gameData)
 {
-    Vector2 direction = target; // Direction vector from enemy to target
-    float distance = 1.0f;
+    Vector2 direction = target;                                // Direction vector from enemy to target
+    float distance = Vector2Distance(enemy->position, target); // Distance to the target
 
     if (distance > 0)
     {
-        // Normalize the direction vector
-        direction = Vector2Normalize(direction);
         enemy->direction = direction; // Update enemy direction
 
         // accelerate in the direction of the target
@@ -199,6 +197,7 @@ void EnemyUpdate(Enemy *enemy, GameData *gameData)
     // Update the enemy's position using its current velocity
     Vector2 move = Vector2Scale(enemy->direction, GetFrameTime());
     EntityMove(&enemy->position, move, enemy->width, enemy->height, gameData);
+    frameCount++;
 }
 
 Enemies CreateEnemies(EnemySeeder *seeder)
@@ -220,7 +219,7 @@ Enemies CreateEnemies(EnemySeeder *seeder)
         enemies.enemies[i].height = 16;
         enemies.enemies[i].state = EnemyStates::Neutral;
         enemies.enemies[i].animationTime = 0.0f;
-        enemies.enemies[i].friction = 15.0f;
+        enemies.enemies[i].friction = 5.0f;
         float r = GetRandomValue(0, 7) / 4 * PI;
         enemies.enemies[i].direction = Vector2{cos(r), sin(r)};
         switch (seeder->type[i])
@@ -231,7 +230,7 @@ Enemies CreateEnemies(EnemySeeder *seeder)
             enemies.enemies[i].attackDamage = 10;
             enemies.enemies[i].attackCooldown = 0.3f; // .3 second cooldown
             enemies.enemies[i].attackCooldownTimer = 0.0f;
-            enemies.enemies[i].acceleration = 200000.0f; // Acceleration of the enemy
+            enemies.enemies[i].acceleration = 200.0f; // Acceleration of the enemy
             break;
         case ENEMY_RANGED:
             enemies.enemies[i].type = ENEMY_RANGED;
