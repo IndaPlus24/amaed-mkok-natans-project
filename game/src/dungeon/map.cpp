@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "map.h"
 #include "enemiesFunks.h"
+#include "gameData.h"
 
 
 // TEMPORARY FUNCTION
@@ -55,7 +56,7 @@ Room* CreateMap(int floors, int roomsPerFloor, int width, int height, int floorS
         {
             if(i >= floorSwitch)
             {
-                map[i * roomsPerFloor + j] = DrunkardsWalk(i * roomsPerFloor + j, width, height, 15, map[i * roomsPerFloor + j - 1].doors[1]);
+                //map[i * roomsPerFloor + j] = DrunkardsWalk(i * roomsPerFloor + j, width, height, 15, map[i * roomsPerFloor + j - 1].doors[1]);
             }
             else
             {
@@ -68,7 +69,7 @@ Room* CreateMap(int floors, int roomsPerFloor, int width, int height, int floorS
     return map;
 }
 
-Room DrunkardsWalk(int startX, int startY, int id, int width, int height, int iterations, Door* previousDoor = nullptr)
+Room DrunkardsWalk(int startX, int startY, int id, int width, int height, int iterations, Door* previousDoor)
 {
     int possibleDoors[25][2][4]; // 100 first locations visited by the drunkard that are guaranteed to be walkable. 0 = Up, 1 = Down, 2 = Left, 3 = Right
     int possibleDoorsCount = 0;
@@ -148,8 +149,8 @@ Room DrunkardsWalk(int startX, int startY, int id, int width, int height, int it
             i--;
         }
         // we have found an outer wall, we can add a door to the room.
-        roomms.doors[0] = CreateDoor(previousDoor, id, possibleDoors[random()%possibleDoors][0][random()%4], possibleDoors[random()%possibleDoors][1][random()%4]);
-        rooms.doors[1] = CreateDoor(previousDoor, id, possibleDoors[random()%possibleDoors][0][random()%4], possibleDoors[random()%possibleDoors][1][random()%4]); // door index 1 is the exit, linmking it to the previous room is fixed if there is a next one since that function does the same as this one
+        room.doors[0] = CreateDoor(previousDoor, id, possibleDoors[random()%possibleDoorsCount][0][random()%4], possibleDoors[random()%possibleDoorsCount][1][random()%4]);
+        room.doors[1] = CreateDoor(previousDoor, id, possibleDoors[random()%possibleDoorsCount][0][random()%4], possibleDoors[random()%possibleDoorsCount][1][random()%4]); // door index 1 is the exit, linmking it to the previous room is fixed if there is a next one since that function does the same as this one
     }
     return room;
 }
@@ -197,7 +198,7 @@ void RoomDraw(Room *room)
     {
         for (int y = 0; y < room->height; y++)
         {
-            if (!GetTile(r  oom, x, y).walkable)
+            if (!GetTile(room, x, y).walkable)
             {
                 DrawRectangle(x * tileSize, y * tileSize, tileSize, tileSize, BLUE);
             }
@@ -213,15 +214,6 @@ void RoomDraw(Room *room)
 Tile GetTile(Room *room, int x, int y)
 {
     // Make sure no one thinks you can walk across the tiles outside.
-    if (x < 0 || x >= room->width || y < 0 || y >= room->height)
-    {
-        Tile tile;
-        tile.walkable = false;
-        tile.isDoor = false;
-        tile.isWall = true;
-        
-        return tile;
-    }
 
     Tile tile = room->tiles[x + y * room->width];
 

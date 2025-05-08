@@ -65,7 +65,9 @@ struct Map
 
 Room CreateRoom(int id, int width, int height);
 
-Room DrunkardsWalk(int id, int width, int height, int iterations);
+Room DrunkardsWalk(int startX, int startY, int id, int width, int height, int iterations, Door* previousDoor = nullptr);
+
+void ConnectRooms(Door* door1, Door* door2);
 
 Door CreateDoor(int fromId, int toId);
 
