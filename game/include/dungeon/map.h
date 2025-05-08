@@ -6,6 +6,7 @@ struct Door;
 
 #include <vector>
 #include "tile.h"
+#include "gameData.h"
 
 // ---------------------
 // Room
@@ -51,6 +52,7 @@ struct Door
     int fromRoomId;
     int toRoomId;
     Door* linkedDoor; // Pointer to the linked door in the other room.
+    Room* room; // Pointer to the room this door is in.
 };
 
 // ---------------------
@@ -59,13 +61,28 @@ struct Door
 
 struct Map
 {
-    std::vector<Room> rooms;
-    std::vector<Door> doors;
+    Room * rooms; // Pointer to the array of rooms
+    int roomsPerFloor;
+    int floors;
+    int currentFloor;
+    int currentRoom;
+};
+
+struct Chamber
+{
+    int x, y, w, h;          // bounding rectangle of this Chamber
+    Chamber *left  = nullptr;   // children after a split (nullptr when this is a final Chamber)
+    Chamber *right = nullptr;
+    int roomX = 0, roomY = 0, roomW = 0, roomH = 0;
 };
 
 Room CreateRoom(int id, int width, int height);
 
-Room DrunkardsWalk(int startX, int startY, int id, int width, int height, int iterations, Door* previousDoor = nullptr);
+Map CreateMap(int floors, int roomsPerFloor, int width, int height, int floorSwitch, GameData* gameData);
+
+Room DrunkardsWalk(int startX, int startY, int id, int width, int height, int iterations, Door *previousDoor, int entryDoorX, int entryDoorY);
+
+Room BSP(int id, int width, int height, int iterations, Door *previousDoor);
 
 void ConnectRooms(Door* door1, Door* door2);
 

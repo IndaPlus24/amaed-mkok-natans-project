@@ -9,10 +9,9 @@
 #include "playerFunks.h"
 #include "projectilesFunks.h"
 #include "enemiesFunks.h"
+#include "map.h"
 
 GameData gameData;
-// Temporary variable, get rid off it when a proper map has been implemented. - N
-Room a;
 
 void InitGM(dataGM initdata)
 {
@@ -27,9 +26,9 @@ void InitGM(dataGM initdata)
 
     gameData.player.sheets[0] = LoadSpriteSheet("assets/sprites/n0llan.png", 8, 1);
 
-    a = DrunkardsWalk(30,25,0, 50, 30, 150, nullptr);
-    
-    gameData.currentRoom = &a;
+    Map map = CreateMap(3,6,50,30,1,&gameData);
+    gameData.map = &map;
+    gameData.currentRoom = &gameData.map->rooms[0];
     
     gameData.projectiles.count = 0;
     gameData.projectiles.capacity = 16;

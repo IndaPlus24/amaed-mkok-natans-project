@@ -6,12 +6,14 @@
 #include "projectilesStruct.h"
 #include "map.h"
 
+struct Map; // Forward declaration of Map struct
+
 typedef struct GameData {
     Player player;
     Enemies enemies;
     Projectiles projectiles;
     Room *currentRoom;
-    Map map;
+    Map* map;
 } GameData;
 
 #endif
