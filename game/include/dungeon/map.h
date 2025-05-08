@@ -26,6 +26,7 @@ enum class RoomType
     BossRoom
 };
 
+/// @brief  first door is the entrance so we always know that the room we came from is the first one.
 struct Room
 {
     int id;
@@ -33,6 +34,8 @@ struct Room
     RoomType type;
     std::vector<int> tags;
     Tile* tiles;
+    Door* doors; // Doors in the room
+    int doorsCount; // Number of doors in the room
     // Could add tags and such later...
 };
 
@@ -43,10 +46,11 @@ struct Room
 struct Door
 {
     int fromDir;
-    int fromRoomOffset;
-    int toRoomOffset;
+    int posX;
+    int posY;
     int fromRoomId;
     int toRoomId;
+    Door* linkedDoor; // Pointer to the linked door in the other room.
 };
 
 // ---------------------
