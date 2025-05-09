@@ -74,7 +74,8 @@ GameState RunGM()
     }
 
     DrawText("Test Room.", 0, 0, 20, WHITE);
-    
+    //draws the framerate
+    DrawText(TextFormat("FPS: %i", GetFPS()), 0, 40, 20, WHITE);
 
     EndDrawing();
 

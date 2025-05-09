@@ -7,6 +7,9 @@
 #include "enemiesStruct.h"
 #include "gameData.h"
 
+const int dx[4] = {1, -1, 0, 0};
+const int dy[4] = {0, 0, 1, -1};
+
 void ConnectRooms(Door *door1, Door *door2)
 {
     if (door1 == nullptr || door2 == nullptr)
@@ -82,27 +85,27 @@ Map CreateMap(int floors, int roomsPerFloor, int width, int height, int floorSwi
                 map.rooms[i * roomsPerFloor + j] = BSP(i * roomsPerFloor + j, width, height, 100, previousDoor);
             }
             previousDoor = &map.rooms[i * roomsPerFloor + j].doors[1];
-            
-            Vector2 enemyPos[10 + (i * roomsPerFloor + j) * 10];
-            EnemyType enemyTypes[10 + (i * roomsPerFloor + j) * 10];
-            EnemyBehavior enemyBehaviors[10 + (i * roomsPerFloor + j) * 10];
-            for (int k = 0; k < 10 + (i * roomsPerFloor + j) * 10 ; k++)
+
+            int maxEnemies = 10 + (i * roomsPerFloor + j) * 10;
+            Vector2 enemyPos[maxEnemies];
+            EnemyType enemyTypes[maxEnemies];
+            EnemyBehavior enemyBehaviors[maxEnemies];
+            for (int k = 0; k < maxEnemies; k++)
             {
                 while (true)
                 {
-                    enemyPos[k] = Vector2{(float)(rand() % (width - 2) ), (float)(rand() % (height - 2))};
+                    enemyPos[k] = Vector2{(float)(rand() % (width - 2)), (float)(rand() % (height - 2))};
                     if (map.rooms[i * roomsPerFloor + j].tiles[(int)enemyPos[k].x + (int)enemyPos[k].y * width].walkable)
                     {
                         enemyPos[k].x = enemyPos[k].x * tileSize + tileSize / 2;
                         enemyPos[k].y = enemyPos[k].y * tileSize + tileSize / 2;
                         break;
                     }
-                    
                 }
                 enemyTypes[k] = (EnemyType)(1 + (rand() % 2));
                 enemyBehaviors[k] = BEHAVIOR_RUSH;
             }
-            map.enemies[i * roomsPerFloor + j] = CreateEnemies(CreateEnemySeeder(10 + (i * roomsPerFloor + j) * 10 , enemyPos, enemyTypes, enemyBehaviors));
+            map.enemies[i * roomsPerFloor + j] = CreateEnemies(CreateEnemySeeder(maxEnemies, enemyPos, enemyTypes, enemyBehaviors));
             printf("Enemies created for room %d on floor %d\n", i * roomsPerFloor + j, i);
         }
     }
@@ -367,6 +370,26 @@ Room BSP(int id, int width, int height, int iterations, Door *previousDoor)
     for (int y = 0; y < height; ++y)
         for (int x = 0; x < width; ++x)
         {
+            if (room.tiles[x + y * width].walkable)
+            {
+                for (int dir = 0; dir < 4; ++dir)
+                {
+                    int nx = x + dx[dir];
+                    int ny = y + dy[dir];
+                    if (nx < 0 || nx >= width || ny < 0 || ny >= height)
+                        continue; // out of bounds
+                    if (!room.tiles[nx + ny * width].walkable){
+                        if (possibleDoorsCount < 25)
+                        {
+                            possibleDoors[possibleDoorsCount][0] = nx;
+                            possibleDoors[possibleDoorsCount][1] = ny;
+                            ++possibleDoorsCount;
+                        }
+                    }
+                }
+            }
+
+            /*
             if (!room.tiles[x + y * width].walkable)
                 continue;
             if (x == 0 || x == width - 1 || y == 0 || y == height - 1)
@@ -378,6 +401,7 @@ Room BSP(int id, int width, int height, int iterations, Door *previousDoor)
                     ++possibleDoorsCount;
                 }
             }
+                */
         }
 
     if (previousDoor != nullptr)
@@ -391,6 +415,26 @@ Room BSP(int id, int width, int height, int iterations, Door *previousDoor)
         int idx = room.doors[0].posX + room.doors[0].posY * width;
         room.tiles[idx].door = &room.doors[0];
         room.tiles[idx].walkable = true;
+        /*
+        // make sure to carve a corridor to the enry door from the nearest walkable tile
+        int directionx = room.doors[0].posX;
+        int directiony = room.doors[0].posY;
+        for (int length = 0; length < 10; length++)
+        {
+            for (int direction = 0; direction < 4; ++direction)
+            {
+                int nx = directionx + dx[direction]*length;
+                int ny = directiony + dy[direction]*length;
+                if (nx < 0 || nx >= width || ny < 0 || ny >= height)
+                    continue; // out of bounds
+                if (room.tiles[nx + ny * width].walkable)
+                {
+                    carveCorridor(&room, directionx, directiony, nx, ny);
+                    break;
+                }
+            }
+        }
+        */
     }
 
     // exit door – any random perimeter walkable tile
