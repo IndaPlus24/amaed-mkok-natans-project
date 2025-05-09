@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "map.h"
 #include "enemiesFunks.h"
+#include "enemiesStruct.h"
 #include "gameData.h"
 
 void ConnectRooms(Door *door1, Door *door2)
@@ -44,6 +45,7 @@ Map CreateMap(int floors, int roomsPerFloor, int width, int height, int floorSwi
     map.roomsPerFloor = roomsPerFloor;
     Door *previousDoor = nullptr;
     map.rooms = new Room[floors * roomsPerFloor];
+    map.enemies = new Enemies[floors * roomsPerFloor];
     for (int i = 0; i < floors; i++)
     {
         for (int j = 0; j < roomsPerFloor; j++)
@@ -80,6 +82,28 @@ Map CreateMap(int floors, int roomsPerFloor, int width, int height, int floorSwi
                 map.rooms[i * roomsPerFloor + j] = BSP(i * roomsPerFloor + j, width, height, 100, previousDoor);
             }
             previousDoor = &map.rooms[i * roomsPerFloor + j].doors[1];
+            
+            Vector2 enemyPos[10 + (i * roomsPerFloor + j) * 10];
+            EnemyType enemyTypes[10 + (i * roomsPerFloor + j) * 10];
+            EnemyBehavior enemyBehaviors[10 + (i * roomsPerFloor + j) * 10];
+            for (int k = 0; k < 10 + (i * roomsPerFloor + j) * 10 ; k++)
+            {
+                while (true)
+                {
+                    enemyPos[k] = Vector2{(float)(rand() % (width - 2) ), (float)(rand() % (height - 2))};
+                    if (map.rooms[i * roomsPerFloor + j].tiles[(int)enemyPos[k].x + (int)enemyPos[k].y * width].walkable)
+                    {
+                        enemyPos[k].x = enemyPos[k].x * tileSize + tileSize / 2;
+                        enemyPos[k].y = enemyPos[k].y * tileSize + tileSize / 2;
+                        break;
+                    }
+                    
+                }
+                enemyTypes[k] = (EnemyType)(1 + (rand() % 2));
+                enemyBehaviors[k] = BEHAVIOR_RUSH;
+            }
+            map.enemies[i * roomsPerFloor + j] = CreateEnemies(CreateEnemySeeder(10 + (i * roomsPerFloor + j) * 10 , enemyPos, enemyTypes, enemyBehaviors));
+            printf("Enemies created for room %d on floor %d\n", i * roomsPerFloor + j, i);
         }
     }
     map.currentRoom = 0;
