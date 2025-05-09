@@ -251,7 +251,12 @@ Enemies CreateEnemies(EnemySeeder *seeder)
             break;
         }
     }
+    free(seeder->positions); // Free the seeder's positions array
+    free(seeder->type);     // Free the seeder's type array
+    free(seeder->behavior); // Free the seeder's behavior array
+    free(seeder);          // Free the seeder itself
 
+    printf("Enemies created\n");
     return enemies;
 }
 

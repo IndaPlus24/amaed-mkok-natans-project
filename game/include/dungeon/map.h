@@ -4,12 +4,11 @@
 struct Room;
 struct Door;
 
-#include "enemiesStruct.h"
 #include <vector>
 #include "tile.h"
 
 struct GameData;          // forward declaration replaces the include
-
+struct Enemies;         // forward declaration replaces the include
 
 // ---------------------
 // Room
