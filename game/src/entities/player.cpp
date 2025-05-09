@@ -183,15 +183,15 @@ void PlayerDraw(Player *player)
         break;
     case PlayerState::Attack:
         DrawRectangle((int)(player->position.x - ((player->width) >> 1)), (int)(player->position.y - ((player->height) >> 1)), (int)player->width, (int)player->height, ORANGE);
+        AttackDebugDraw(&player->attack, player->position, player->direction);
         if (dir > 2 && dir < 6)
         {
-            WeaponDraw(player->weapon, player->position, dir, player->attack.currentFrame, WeaponState::Idle);
+            WeaponDraw(player->weapon, player->position, dir, player->attack.currentFrame, WeaponState::Attack);
         }
-        DrawCentre(&player->sheets[0], dir, 0, player->position);
-        AttackDebugDraw(&player->attack, player->position, player->direction);
+        DrawCentre(&player->sheets[1], dir, player->attack.currentFrame, player->position);
         if (dir <= 2 || dir >= 6)
         {
-            WeaponDraw(player->weapon, player->position, dir, player->attack.currentFrame, WeaponState::Idle);
+            WeaponDraw(player->weapon, player->position, dir, player->attack.currentFrame, WeaponState::Attack);
         }
         break;
     case PlayerState::Stunned:

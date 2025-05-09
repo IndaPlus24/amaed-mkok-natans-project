@@ -24,7 +24,7 @@ void Draw(const SpriteSheet *sheet, int direction, int frame, Vector2 pos)
 {
     Rectangle source;
     source.x = frame * sheet->width;
-    source.y = direction * sheet->height;
+    source.y = (7 - direction) * sheet->height;
     source.width = sheet->width;
     source.height = sheet->height;
     pos.x = floorf(pos.x);

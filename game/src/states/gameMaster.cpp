@@ -25,7 +25,8 @@ void InitGM(dataGM initdata)
 
     gameData.enemies = CreateEnemies(CreateEnemySeeder(2, enemyPos, enemyTypes , enemyBehaviors));
 
-    gameData.player.sheets[0] = LoadSpriteSheet("assets/sprites/n0llan.png", 8, 1);
+    gameData.player.sheets[0] = LoadSpriteSheet("assets/sprites/n0llan_idle.png", 8, 1);
+    gameData.player.sheets[1] = LoadSpriteSheet("assets/sprites/n0llan_attack.png", 8, 3);
 
     a = DrunkardsWalk(0, 50, 30, 150);
     

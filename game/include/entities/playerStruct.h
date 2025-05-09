@@ -8,7 +8,7 @@
 #include "attackStruct.h"
 #include "weaponsStruct.h"
 
-#define PLAYER_SPRITE_SHEETS 1
+#define PLAYER_SPRITE_SHEETS 2
 #define PLAYER_WEAPON_COUNT 1
 
 enum class PlayerState {

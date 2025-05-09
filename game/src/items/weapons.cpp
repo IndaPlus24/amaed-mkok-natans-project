@@ -16,7 +16,7 @@ Weapon CreateWeapon(WeaponPrefabs prefab)
         // Temporarily just load all of them
         weapon.idleSheet = LoadSpriteSheet("assets/sprites/purju_idle.png", 8, 1);
         weapon.walkSheet = LoadSpriteSheet("assets/sprites/purju_idle.png", 8, 1);
-        weapon.attackSheet = LoadSpriteSheet("assets/sprites/purju_idle.png", 8, 1);
+        weapon.attackSheet = LoadSpriteSheet("assets/sprites/purju_attack.png", 8, 3);
         break;
     }
 
@@ -49,7 +49,7 @@ void WeaponDraw(const Weapon *weapon, Vector2 position, int dir, int frame, Weap
         DrawCentre(&weapon->walkSheet, dir, frame, position);
         break;
     case WeaponState::Attack:
-        DrawCentre(&weapon->walkSheet, dir, frame, position);
+        DrawCentre(&weapon->attackSheet, dir, frame, position);
         break;
     }
 }
