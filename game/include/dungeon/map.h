@@ -4,7 +4,7 @@
 struct Room;
 struct Door;
 
-#include <vector>
+#include "enemies.h"
 #include "tile.h"
 
 struct GameData;          // forward declaration replaces the include
@@ -63,6 +63,7 @@ struct Door
 struct Map
 {
     Room * rooms; // Pointer to the array of rooms
+    Enemies* enemies; // Pointer to the enemies in all rooms.
     int roomsPerFloor;
     int floors;
     int currentFloor;

@@ -18,16 +18,12 @@ void InitGM(dataGM initdata)
     // Initiate floor, room, enemies, player, and so on.
     gameData.player = CreatePlayer(Vector2{(float)(tileSize * 25), (float)(tileSize * 15)});
 
-    Vector2 enemyPos[2] = {Vector2{(float)(tileSize * 10), (float)(tileSize * 10)}, Vector2{(float)(tileSize * 15), (float)(tileSize * 15)}};
-    EnemyType enemyTypes[2] = {ENEMY_MELEE, ENEMY_MELEE};
-    EnemyBehavior enemyBehaviors[2] = {BEHAVIOR_RUSH, BEHAVIOR_RUSH};
-
-    gameData.enemies = CreateEnemies(CreateEnemySeeder(2, enemyPos, enemyTypes , enemyBehaviors));
 
     gameData.player.sheets[0] = LoadSpriteSheet("assets/sprites/n0llan.png", 8, 1);
 
     gameData.map = CreateMap(3,6,50,30,1,&gameData);
-    gameData.currentRoom = &gameData.map.rooms[0];
+    gameData.currentRoom = &gameData.map.rooms[1];
+    gameData.enemies = gameData.map.enemies[1];
     printf("Current room: %d\n", gameData.currentRoom );
     
     gameData.projectiles.count = 0;

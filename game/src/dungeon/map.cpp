@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "map.h"
 #include "enemiesFunks.h"
+#include "enemiesStruct.h"
 #include "gameData.h"
 
 void ConnectRooms(Door *door1, Door *door2)
@@ -80,6 +81,26 @@ Map CreateMap(int floors, int roomsPerFloor, int width, int height, int floorSwi
                 map.rooms[i * roomsPerFloor + j] = BSP(i * roomsPerFloor + j, width, height, 100, previousDoor);
             }
             previousDoor = &map.rooms[i * roomsPerFloor + j].doors[1];
+            
+            Vector2 enemyPos[10 + (i * roomsPerFloor + j) * 10];
+            EnemyType enemyTypes[10 + (i * roomsPerFloor + j) * 10];
+            EnemyBehavior enemyBehaviors[10 + (i * roomsPerFloor + j) * 10];
+            for (int k = 0; k <= 10 + (i * roomsPerFloor + j) * 10 ; k++)
+            {
+                while (true)
+                {
+                    enemyPos[k] = Vector2{(float)(rand() % (width - 2) + 1), (float)(rand() % (height - 2) + 1)};
+                    if (map.rooms[i * roomsPerFloor + j].tiles[(int)enemyPos[k].x + (int)enemyPos[k].y * width].walkable)
+                    {
+                        break;
+                    }
+                    
+                }
+                enemyTypes[k] = 1 + (rand() % 2);
+                enemyBehaviors[k] = BEHAVIOR_RUSH;
+            }
+            map.enemies[i * roomsPerFloor + j] = CreateEnemies(CreateEnemySeeder(10 + (i * roomsPerFloor + j) * 10 , enemyPos, enemyTypes, enemyBehaviors))
+            
         }
     }
     map.currentRoom = 0;
