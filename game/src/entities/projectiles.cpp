@@ -2,6 +2,11 @@
 #include "entityFunks.h"
 #include "attackFunks.h"
 
+#ifndef reallocarray
+    #include <cstdlib>  // For realloc
+    #define reallocarray(ptr, count, size) realloc(ptr, (count) * (size))
+#endif
+
 Projectile *ProjectilesPush(GameData *gameData)
 {
     if (gameData->projectiles.count == gameData->projectiles.capacity)

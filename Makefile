@@ -1,27 +1,34 @@
 # Perhaps, I have been to harsh on you
+LIBS = -lraylib -lm -lpthread -lstdc++
 
+UNAME := $(shell uname)
+ifeq ($(UNAME), Linux)
+	LIBS += -lGL -ldl -lrt
+	LD = g++
+endif
 EXE = AQoQ.exe
 
 LD = g++
+LDFLAGS = $(LIBS)
 
 C_ARGS = -Igame/include/ -Igame/include/states/ -Igame/include/entities -Igame/include/dungeon -Igame/include/utils -Iengine/include -Iengine/include/graphics -Wall
 
 # The directory for *.o files
 O_DIR = bin/
 
-MAIN_SRC = $(O_DIR)main.o $(O_DIR)mainMenu.o $(O_DIR)gameMaster.o $(O_DIR)input.o $(O_DIR)AI.o $(O_DIR)enemies.o $(O_DIR)player.o $(O_DIR)map.o ${O_DIR}entities.o ${O_DIR}spriteSheet.o ${O_DIR}attack.o ${O_DIR}projectiles.o
+MAIN_SRC = $(O_DIR)main.o $(O_DIR)mainMenu.o $(O_DIR)gameMaster.o $(O_DIR)input.o $(O_DIR)AI.o $(O_DIR)enemies.o $(O_DIR)player.o $(O_DIR)map.o ${O_DIR}entities.o ${O_DIR}spriteSheet.o ${O_DIR}attack.o ${O_DIR}projectiles.o ${O_DIR}score.o
 
 default: main
 
 main: $(EXE)
 
 $(EXE): $(MAIN_SRC)
-	$(LD) $(C_ARGS) -o $(EXE) $(MAIN_SRC) -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+	$(LD) $(C_ARGS) -o $(EXE) $(MAIN_SRC) $(LDFLAGS)
 
 $(O_DIR)main.o: game/src/main.cpp game/include/states/mainMenu.h game/include/states/gameMaster.h 
 	$(LD) $(C_ARGS) -c -o $(O_DIR)main.o game/src/main.cpp
 
-$(O_DIR)mainMenu.o: game/src/states/mainMenu.cpp game/include/states/mainMenu.h game/include/states/gameMaster.h engine/include/input.h
+$(O_DIR)mainMenu.o: game/src/states/mainMenu.cpp game/include/states/mainMenu.h game/include/states/gameMaster.h engine/include/input.h game/include/utils/score.h
 	$(LD) $(C_ARGS) -c -o $(O_DIR)mainMenu.o game/src/states/mainMenu.cpp
 
 $(O_DIR)gameMaster.o: game/src/states/gameMaster.cpp game/include/states/gameMaster.h engine/include/input.h game/include/utils/gameData.h engine/include/graphics/spriteSheet.h game/include/entities/playerFunks.h game/include/entities/projectilesFunks.h
@@ -39,7 +46,7 @@ ${O_DIR}map.o: game/src/dungeon/map.cpp game/include/dungeon/map.h
 ${O_DIR}player.o: game/src/entities/player.cpp game/include/entities/playerFunks.h game/include/entities/entityFunks.h game/include/entities/attackFunks.h
 	$(LD) $(C_ARGS) -c -o $(O_DIR)player.o game/src/entities/player.cpp
 
-${O_DIR}enemies.o: game/src/entities/enemies.cpp game/include/entities/enemiesFunks.h game/include/entities/AI.h
+${O_DIR}enemies.o: game/src/entities/enemies.cpp game/include/entities/enemiesFunks.h game/include/entities/AI.h game/include/utils/score.h
 	$(LD) $(C_ARGS) -c -o $(O_DIR)enemies.o game/src/entities/enemies.cpp
 
 ${O_DIR}entities.o: game/src/entities/entities.cpp game/include/entities/entityFunks.h
@@ -53,6 +60,9 @@ ${O_DIR}attack.o: game/src/entities/attack.cpp game/include/entities/attackFunks
 
 ${O_DIR}projectiles.o: game/src/entities/projectiles.cpp game/include/entities/projectilesFunks.h game/include/entities/entityFunks.h game/include/entities/attackFunks.h
 	$(LD) $(C_ARGS) -c -o $(O_DIR)projectiles.o game/src/entities/projectiles.cpp
+
+${O_DIR}score.o: game/src/utils/score.cpp game/include/utils/score.h game/include/entities/enemiesStruct.h
+	$(LD) $(C_ARGS) -c -o ${O_DIR}score.o game/src/utils/score.cpp
 
 
 game/include/states/gameMaster.h: game/include/states/gameState.h
