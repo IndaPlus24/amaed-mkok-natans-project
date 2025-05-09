@@ -10,27 +10,22 @@
 #include "projectilesFunks.h"
 #include "enemiesFunks.h"
 #include "score.h"
+#include "map.h"
 
 GameData gameData;
-// Temporary variable, get rid off it when a proper map has been implemented. - N
-Room a;
 
 void InitGM(dataGM initdata)
 {
     // Initiate floor, room, enemies, player, and so on.
     gameData.player = CreatePlayer(Vector2{(float)(tileSize * 25), (float)(tileSize * 15)});
 
-    Vector2 enemyPos[2] = {Vector2{(float)(tileSize * 10), (float)(tileSize * 10)}, Vector2{(float)(tileSize * 15), (float)(tileSize * 15)}};
-    EnemyType enemyTypes[2] = {ENEMY_MELEE, ENEMY_MELEE};
-    EnemyBehavior enemyBehaviors[2] = {BEHAVIOR_RUSH, BEHAVIOR_RUSH};
-
-    gameData.enemies = CreateEnemies(CreateEnemySeeder(2, enemyPos, enemyTypes , enemyBehaviors));
 
     gameData.player.sheets[0] = LoadSpriteSheet("assets/sprites/n0llan.png", 8, 1);
 
-    a = DrunkardsWalk(0, 50, 30, 150);
-    
-    gameData.currentRoom = &a;
+    gameData.map = CreateMap(3,6,50,30,1,&gameData);
+    gameData.currentRoom = &gameData.map.rooms[1];
+    gameData.enemies = gameData.map.enemies[1];
+    printf("Current room: %d\n", gameData.currentRoom );
     
     gameData.projectiles.count = 0;
     gameData.projectiles.capacity = 16;
@@ -42,9 +37,7 @@ GameState RunGM()
 {
     // Get inputs
     Inputs inputs = GetInputs();
-
     PlayerUpdate(&gameData, &inputs);
-
     //UPDATES ALL ENEMIES   
     for (int i = 0; i < gameData.enemies.count; i++)
     {
@@ -61,9 +54,13 @@ GameState RunGM()
     RoomDraw(gameData.currentRoom);
     
     PlayerDraw(&gameData.player);
-    EnemyDraw(&gameData.enemies.enemies[0]);
-    EnemyDraw(&gameData.enemies.enemies[1]);
+
     ScoreDraw();
+
+    for(int i = 0; i < gameData.enemies.count; i++)
+    {
+        EnemyDraw(&gameData.enemies.enemies[i]);
+    }
 
 
     for (int i = 0; i <  gameData.projectiles.count; i++) {
