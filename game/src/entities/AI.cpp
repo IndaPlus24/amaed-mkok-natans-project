@@ -2,6 +2,7 @@
 #include <limits>
 #include <cmath>
 
+#include <stdio.h>
 #include "AI.h"
 #include "gameData.h"
 

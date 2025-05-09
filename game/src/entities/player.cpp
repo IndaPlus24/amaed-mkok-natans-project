@@ -1,5 +1,6 @@
 #include <raylib.h>
 #include <raymath.h>
+#include <stdio.h>
 
 #include "playerFunks.h"
 #include "entityFunks.h"
@@ -7,6 +8,8 @@
 
 #define INVINCIBILITY_DURATION 2.0f
 #define STUN_DURATION 0.4f
+
+bool isInDoor = false;
 
 void PlayerFriction(Player *player)
 {
@@ -135,11 +138,32 @@ void PlayerUpdate(GameData *gameData, const Inputs *in)
 
     Vector2 move = Vector2Scale(player->velocity, GetFrameTime());
     EntityMove(&player->position, move, player->width, player->height, gameData);
+    // If this doesn't work it will be hard to debug :)
+    // Could implement a version of this that doesnt use fixed array indeces and instead loops through all possible doors in the room but this works for now since we only have 2 doors maximum ATM.
+    if (((int)(player->position.x/tileSize) == gameData->currentRoom->doors[0].posX && (int)(player->position.y/tileSize) == gameData->currentRoom->doors[0].posY) && !isInDoor)
+    {
+        isInDoor = true;
+        player->position.x = gameData->currentRoom->doors[0].linkedDoor->posX * tileSize;
+        player->position.y = gameData->currentRoom->doors[0].linkedDoor->posY * tileSize;
+        gameData->currentRoom = &gameData->map.rooms[gameData->currentRoom->doors[0].toRoomId];
+    }
+    else if (((int)(player->position.x/tileSize) == gameData->currentRoom->doors[1].posX && (int)(player->position.y/tileSize) == gameData->currentRoom->doors[1].posY) && !isInDoor)
+    {
+        isInDoor = true;
+        player->position.x = gameData->currentRoom->doors[1].linkedDoor->posX * tileSize;
+        player->position.y = gameData->currentRoom->doors[1].linkedDoor->posY * tileSize;
+        gameData->currentRoom = &gameData->map.rooms[gameData->currentRoom->doors[1].toRoomId];
+    }
+    else if (isInDoor && !((player->position.x == gameData->currentRoom->doors[0].posX * tileSize && player->position.y == gameData->currentRoom->doors[0].posY * tileSize) || (player->position.x == gameData->currentRoom->doors[1].posX * tileSize && player->position.y == gameData->currentRoom->doors[1].posY * tileSize)))
+    {
+        isInDoor = false;
+    }
 }
 
 void PlayerDraw(Player *player)
 {
-    if (player->invincibilityTimer > 0.0f && ((int)(GetTime()*10.0)) & 1) {
+    if (player->invincibilityTimer > 0.0f && ((int)(GetTime() * 10.0)) & 1)
+    {
         return;
     }
 

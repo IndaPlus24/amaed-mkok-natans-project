@@ -6,6 +6,8 @@
 #include "projectilesStruct.h"
 #include "map.h"
 
+struct Map; // Forward declaration of Map struct
+
 typedef struct GameData {
     Player player;
     Enemies enemies;
