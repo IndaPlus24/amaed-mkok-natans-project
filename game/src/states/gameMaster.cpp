@@ -27,7 +27,7 @@ void InitGM(dataGM initdata)
     gameData.player.sheets[0] = LoadSpriteSheet("assets/sprites/n0llan.png", 8, 1);
 
     gameData.map = CreateMap(3,6,50,30,1,&gameData);
-    gameData.currentRoom = &gameData.map.rooms[0];
+    gameData.currentRoom = &gameData.map.rooms[1];
     printf("Current room: %d\n", gameData.currentRoom );
     
     gameData.projectiles.count = 0;
