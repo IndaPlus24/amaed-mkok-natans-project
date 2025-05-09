@@ -11,6 +11,8 @@ enum class GameState
     GameOver,
     // Break the main loop
     Break,
+    //High Score page
+    HighScore,
 };
 
 #endif

@@ -9,6 +9,7 @@
 #include "playerFunks.h"
 #include "projectilesFunks.h"
 #include "enemiesFunks.h"
+#include "score.h"
 #include "map.h"
 
 GameData gameData;
@@ -29,6 +30,7 @@ void InitGM(dataGM initdata)
     gameData.projectiles.count = 0;
     gameData.projectiles.capacity = 16;
     gameData.projectiles.list = (Projectile *) malloc(sizeof(Projectile) * gameData.projectiles.capacity);
+    Font arcadeFont = LoadFont("assets/PressStart2P-Regular.ttf");
 }
 
 GameState RunGM()
@@ -52,6 +54,9 @@ GameState RunGM()
     RoomDraw(gameData.currentRoom);
     
     PlayerDraw(&gameData.player);
+
+    ScoreDraw();
+
     for(int i = 0; i < gameData.enemies.count; i++)
     {
         EnemyDraw(&gameData.enemies.enemies[i]);
