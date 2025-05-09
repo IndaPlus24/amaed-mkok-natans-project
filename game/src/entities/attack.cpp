@@ -133,7 +133,7 @@ Attack CreateAttack(void *owner, AttackType attackType)
 
         attack.keyFrames[0].time = 1.0f;
         attack.keyFrames[0].action = AttackAction::SpawnProjectile;
-        attack.keyFrames[0].data = (int)ProjectilePrefabs::Default;
+        attack.keyFrames[0].data = (int)ProjectilePrefabs::Slow;
 
         attack.keyFrames[1].time = 1.2f;
         attack.keyFrames[1].action = AttackAction::End;

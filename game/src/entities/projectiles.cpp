@@ -79,7 +79,7 @@ Projectile *CreateProjectile(ProjectilePrefabs prefab, GameData *gameData, void 
     case ProjectilePrefabs::Slow:
     {
         ptr->behaviour = ProjectileBehaviour::Straight;
-        ptr->speed = 500.0f;
+        ptr->speed = 100.0f;
 
         ptr->targets = (CollisionLayers)(((int)CollisionLayers::Player | (int)CollisionLayers::Enemies) ^ (int)GetEntityType(owner, gameData));
         ptr->pierces = 0;

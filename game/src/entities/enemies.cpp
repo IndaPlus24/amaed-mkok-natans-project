@@ -148,8 +148,6 @@ void EnemyNeutral(Enemy *enemy, GameData *gameData)
     }
 
     // - enemy pathfinding (A* or Dijkstra's algorithm) to find the best path to the player
-    Vector2 target = GetFlowFieldDirection((int)(enemy->position.x / tileSize), (int)(enemy->position.y / tileSize)); // Get the flow field direction for the enemy
-    EnemyMovement(enemy, target, gameData);
     enemy->attackCooldownTimer += GetFrameTime(); // Update the attack cooldown timer
     
     EnemyLineOfSight(enemy, player, room); // Check if the enemy can see the player
@@ -160,6 +158,8 @@ void EnemyNeutral(Enemy *enemy, GameData *gameData)
     }
     if (enemy->aware == true) // two if statements on both values of aware is intended and not a mistake
     {
+        Vector2 target = GetFlowFieldDirection((int)(enemy->position.x / tileSize), (int)(enemy->position.y / tileSize)); // Get the flow field direction for the enemy
+        EnemyMovement(enemy, target, gameData);
         float distance = Vector2Distance(enemy->position, player->position);
         if (distance <= enemy->attackRange && EnemyLineOfSight(enemy, player, room))
         {
@@ -228,6 +228,7 @@ Enemies CreateEnemies(EnemySeeder *seeder)
         enemies.enemies[i].state = EnemyStates::Neutral;
         enemies.enemies[i].animationTime = 0.0f;
         enemies.enemies[i].friction = 25.0f;
+        enemies.enemies[i].aware = false; // Set the enemy as not aware of the player
         float r = GetRandomValue(0, 7) / 4 * PI;
         enemies.enemies[i].direction = Vector2{cos(r), sin(r)};
         switch (seeder->type[i])
@@ -265,6 +266,7 @@ void EnemyGetHit(Enemy *enemy, float damage, Vector2 force)
 {
     enemy->health -= damage;
     enemy->velocity = Vector2Add(enemy->velocity, force);
+    enemy->aware = true; // Set the enemy as aware of the player
 
     if (enemy->state == EnemyStates::Attacking)
     {
