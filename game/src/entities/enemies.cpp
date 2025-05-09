@@ -161,7 +161,7 @@ void EnemyNeutral(Enemy *enemy, GameData *gameData)
     if (enemy->aware == true) // two if statements on both values of aware is intended and not a mistake
     {
         float distance = Vector2Distance(enemy->position, player->position);
-        if (distance <= enemy->attackRange)
+        if (distance <= enemy->attackRange && EnemyLineOfSight(enemy, player, room))
         {
             EnemyStartAttack(enemy, gameData);
         }
