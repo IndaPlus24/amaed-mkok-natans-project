@@ -104,6 +104,7 @@ bool EnemyLineOfSight(Enemy *enemy, Player *player, Room *room)
             int rayGridX = (int)(ray.x / tileSize);
             int rayGridY = (int)(ray.y / tileSize);
 
+            
             if (!GetTile(room, rayGridX, rayGridY).walkable)
             {
                 break; // Ray hit an obstacle.
@@ -140,7 +141,7 @@ void EnemyNeutral(Enemy *enemy, GameData *gameData)
     // TODO : Implement more advanced AI for enemy movement
     // - four types of enemy pathing, ranged (Tries to stay at a good range to hit the player), flanking (tries to cut off the player), guard (guards their target, for example a ranged unit), rush (Just charges at the player which is basically the current behavior but pathfinding is not implemented yet)
 
-    if (frameCount % 3 == 0) // Updates every 30 frammes 1/2 second at 60 fps to reduce CPU load
+    if (frameCount % 3 == 0) // Updates every x frammes to reduce CPU load
     {
         ComputeFlowField((int)(player->position.x / tileSize), (int)(player->position.y / tileSize), gameData); // Compute the flow field from the player's position
     }
@@ -151,7 +152,6 @@ void EnemyNeutral(Enemy *enemy, GameData *gameData)
     enemy->attackCooldownTimer += GetFrameTime(); // Update the attack cooldown timer
     
     EnemyLineOfSight(enemy, player, room); // Check if the enemy can see the player
-
     // Check if the enemy is aware of the player
     if (enemy->aware == false)
     {

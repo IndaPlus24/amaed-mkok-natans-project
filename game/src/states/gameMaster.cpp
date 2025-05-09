@@ -26,9 +26,9 @@ void InitGM(dataGM initdata)
 
     gameData.player.sheets[0] = LoadSpriteSheet("assets/sprites/n0llan.png", 8, 1);
 
-    Map map = CreateMap(3,6,50,30,1,&gameData);
-    gameData.map = &map;
-    gameData.currentRoom = &gameData.map->rooms[0];
+    gameData.map = CreateMap(3,6,50,30,1,&gameData);
+    gameData.currentRoom = &gameData.map.rooms[0];
+    printf("Current room: %d\n", gameData.currentRoom );
     
     gameData.projectiles.count = 0;
     gameData.projectiles.capacity = 16;
@@ -39,7 +39,6 @@ GameState RunGM()
 {
     // Get inputs
     Inputs inputs = GetInputs();
-
     PlayerUpdate(&gameData, &inputs);
     //UPDATES ALL ENEMIES   
     for (int i = 0; i < gameData.enemies.count; i++)

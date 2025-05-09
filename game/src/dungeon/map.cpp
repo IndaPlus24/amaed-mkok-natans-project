@@ -43,35 +43,40 @@ Map CreateMap(int floors, int roomsPerFloor, int width, int height, int floorSwi
     map.floors = floors;
     map.roomsPerFloor = roomsPerFloor;
     Door *previousDoor = nullptr;
-    map.rooms = (Room *)malloc(sizeof(Room) * floors * roomsPerFloor);
+    map.rooms = new Room[floors * roomsPerFloor];
     for (int i = 0; i < floors; i++)
     {
         for (int j = 0; j < roomsPerFloor; j++)
         {
             if (i >= floorSwitch)
             {
-                int entryX = previousDoor ? previousDoor->posX : width  / 2;
+                int entryX = previousDoor ? previousDoor->posX : width / 2;
                 int entryY = previousDoor ? previousDoor->posY : height / 2;
-                if (previousDoor->posX < 0)
+                if (previousDoor)
                 {
-                    entryX = width - 2;
+                    if (previousDoor->posX < 0)
+                    {
+                        entryX = width - 2;
+                    }
+                    else if (previousDoor->posX >= width)
+                    {
+                        entryX = 1;
+                    }
+                    if (previousDoor->posY < 0)
+                    {
+                        entryY = height - 2;
+                    }
+                    else if (previousDoor->posY >= height)
+                    {
+                        entryY = 1;
+                    }
                 }
-                else if (previousDoor->posX >= width)
-                {
-                    entryX = 1;
-                }
-                if (previousDoor->posY < 0)
-                {
-                    entryY = height - 2;
-                }
-                else if (previousDoor->posY >= height)
-                {
-                    entryY = 1;
-                }
+                printf("Creating room using Drunkard %d on floor %d with entry door at (%d, %d)\n", i * roomsPerFloor + j, i, entryX, entryY);
                 map.rooms[i * roomsPerFloor + j] = DrunkardsWalk(entryX, entryY, i * roomsPerFloor + j, width, height, 100, previousDoor, entryX, entryY);
             }
             else
             {
+                printf("Creating room using BSP %d on floor %d\n", i * roomsPerFloor + j, i);
                 map.rooms[i * roomsPerFloor + j] = BSP(i * roomsPerFloor + j, width, height, 100, previousDoor);
             }
             previousDoor = &map.rooms[i * roomsPerFloor + j].doors[1];
@@ -203,9 +208,18 @@ Room DrunkardsWalk(int startX, int startY, int id, int width, int height, int it
         room.tiles[room.doors[0].posX + room.doors[0].posY * width].door = &room.doors[0];
         room.tiles[room.doors[0].posX + room.doors[0].posY * width].walkable = true;
     }
+
     room.doors[1] = CreateDoor(id, possibleDoors[random() % possibleDoorsCount][0], possibleDoors[random() % possibleDoorsCount][1]); // door index 1 is the exit, linmking it to the previous room is fixed if there is a next one since that function does the same as this one
     room.tiles[room.doors[1].posX + room.doors[1].posY * width].door = &room.doors[1];
     room.tiles[room.doors[1].posX + room.doors[1].posY * width].walkable = true;
+
+    if (previousDoor == nullptr)
+    {
+        room.doors[0] = room.doors[1];
+        room.doors[0].linkedDoor = &room.doors[1];
+        int t = room.doors[0].posX + room.doors[0].posY * room.width;
+        room.tiles[t].door = &room.doors[0];
+    }
     return room;
 }
 
@@ -375,7 +389,17 @@ Room BSP(int id, int width, int height, int iterations, Door *previousDoor)
     room.tiles[room.doors[1].posX + room.doors[1].posY * width].door = &room.doors[1];
     room.tiles[room.doors[1].posX + room.doors[1].posY * width].walkable = true;
 
+    if (previousDoor == nullptr)
+    {
+        room.doors[0] = room.doors[1];
+        room.doors[0].linkedDoor = &room.doors[1];
+        int t = room.doors[0].posX + room.doors[0].posY * room.width;
+        room.tiles[t].door = &room.doors[0];
+    }
+
+    printf("trying to free the chamber tree\n");
     freeChamberTree(root);
+    printf("freed the chamber tree\n");
     return room;
 }
 

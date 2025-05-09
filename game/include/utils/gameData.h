@@ -13,7 +13,7 @@ typedef struct GameData {
     Enemies enemies;
     Projectiles projectiles;
     Room *currentRoom;
-    Map* map;
+    Map map;
 } GameData;
 
 #endif

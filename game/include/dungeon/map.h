@@ -6,7 +6,9 @@ struct Door;
 
 #include <vector>
 #include "tile.h"
-#include "gameData.h"
+
+struct GameData;          // forward declaration replaces the include
+
 
 // ---------------------
 // Room
@@ -33,7 +35,6 @@ struct Room
     int id;
     int width, height;
     RoomType type;
-    std::vector<int> tags;
     Tile* tiles;
     Door* doors; // Doors in the room
     int doorsCount; // Number of doors in the room
