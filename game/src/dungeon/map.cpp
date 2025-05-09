@@ -96,10 +96,10 @@ Map CreateMap(int floors, int roomsPerFloor, int width, int height, int floorSwi
                     }
                     
                 }
-                enemyTypes[k] = 1 + (rand() % 2);
+                enemyTypes[k] = (1 + (rand() % 2)) == 1 ? ENEMY_MELEE : ENEMY_RANGED;
                 enemyBehaviors[k] = BEHAVIOR_RUSH;
             }
-            map.enemies[i * roomsPerFloor + j] = CreateEnemies(CreateEnemySeeder(10 + (i * roomsPerFloor + j) * 10 , enemyPos, enemyTypes, enemyBehaviors))
+            map.enemies[i * roomsPerFloor + j] = CreateEnemies(CreateEnemySeeder(10 + (i * roomsPerFloor + j) * 10 , enemyPos, enemyTypes, enemyBehaviors));
             
         }
     }

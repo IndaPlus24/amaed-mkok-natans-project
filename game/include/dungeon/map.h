@@ -4,7 +4,8 @@
 struct Room;
 struct Door;
 
-#include "enemies.h"
+#include "enemiesStruct.h"
+#include <vector>
 #include "tile.h"
 
 struct GameData;          // forward declaration replaces the include

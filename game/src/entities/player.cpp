@@ -146,7 +146,7 @@ void PlayerUpdate(GameData *gameData, const Inputs *in)
         player->position.x = gameData->currentRoom->doors[0].linkedDoor->posX * tileSize;
         player->position.y = gameData->currentRoom->doors[0].linkedDoor->posY * tileSize;
         gameData->currentRoom = &gameData->map.rooms[gameData->currentRoom->doors[0].toRoomId];
-        gameData.enemies = &gameData.map.enemies[gameData->currentRoom->doors[0].toRoomId];
+        gameData->enemies = gameData->map.enemies[gameData->currentRoom->doors[0].toRoomId];
     }
     else if (((int)(player->position.x/tileSize) == gameData->currentRoom->doors[1].posX && (int)(player->position.y/tileSize) == gameData->currentRoom->doors[1].posY) && !isInDoor)
     {
@@ -154,7 +154,7 @@ void PlayerUpdate(GameData *gameData, const Inputs *in)
         player->position.x = gameData->currentRoom->doors[1].linkedDoor->posX * tileSize;
         player->position.y = gameData->currentRoom->doors[1].linkedDoor->posY * tileSize;
         gameData->currentRoom = &gameData->map.rooms[gameData->currentRoom->doors[1].toRoomId];
-        gameData.enemies = &gameData.map.enemies[gameData->currentRoom->doors[1].toRoomId];
+        gameData->enemies = gameData->map.enemies[gameData->currentRoom->doors[1].toRoomId];
     }
     else if (isInDoor && !((player->position.x == gameData->currentRoom->doors[0].posX * tileSize && player->position.y == gameData->currentRoom->doors[0].posY * tileSize) || (player->position.x == gameData->currentRoom->doors[1].posX * tileSize && player->position.y == gameData->currentRoom->doors[1].posY * tileSize)))
     {
