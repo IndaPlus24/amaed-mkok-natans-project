@@ -4,12 +4,12 @@ EXE = AQoQ.exe
 
 LD = g++
 
-C_ARGS = -Igame/include/ -Igame/include/states/ -Igame/include/entities -Igame/include/dungeon -Igame/include/utils -Iengine/include -Iengine/include/graphics -Wall
+C_ARGS = -Igame/include/ -Igame/include/states/ -Igame/include/entities -Igame/include/dungeon -Igame/include/items -Igame/include/utils -Iengine/include -Iengine/include/graphics -Wall
 
 # The directory for *.o files
 O_DIR = bin/
 
-MAIN_SRC = $(O_DIR)main.o $(O_DIR)mainMenu.o $(O_DIR)gameMaster.o $(O_DIR)input.o $(O_DIR)AI.o $(O_DIR)enemies.o $(O_DIR)player.o $(O_DIR)map.o ${O_DIR}entities.o ${O_DIR}spriteSheet.o ${O_DIR}attack.o ${O_DIR}projectiles.o
+MAIN_SRC = $(O_DIR)main.o $(O_DIR)mainMenu.o $(O_DIR)gameMaster.o $(O_DIR)input.o $(O_DIR)AI.o $(O_DIR)enemies.o $(O_DIR)player.o $(O_DIR)map.o ${O_DIR}entities.o ${O_DIR}spriteSheet.o ${O_DIR}attack.o ${O_DIR}projectiles.o ${O_DIR}weapons.o
 
 default: main
 
@@ -53,6 +53,9 @@ ${O_DIR}attack.o: game/src/entities/attack.cpp game/include/entities/attackFunks
 
 ${O_DIR}projectiles.o: game/src/entities/projectiles.cpp game/include/entities/projectilesFunks.h game/include/entities/entityFunks.h game/include/entities/attackFunks.h
 	$(LD) $(C_ARGS) -c -o $(O_DIR)projectiles.o game/src/entities/projectiles.cpp
+
+${O_DIR}weapons.o: game/src/items/weapons.cpp
+	$(LD) $(C_ARGS) -c -o $(O_DIR)weapons.o game/src/items/weapons.cpp
 
 
 game/include/states/gameMaster.h: game/include/states/gameState.h

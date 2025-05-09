@@ -4,6 +4,7 @@
 #include "playerFunks.h"
 #include "entityFunks.h"
 #include "attackFunks.h"
+#include "weaponsFunks.h"
 
 #define INVINCIBILITY_DURATION 2.0f
 #define STUN_DURATION 0.4f
@@ -70,7 +71,7 @@ void PlayerStartAttack(Player *player, GameData *gameData, const Inputs *in, int
     switch (weapon)
     {
     case 0:
-        player->attack = CreateAttack(player, AttackType::testMelee);
+        player->attack = CreateAttack(player, player->weapon + weapon);
         break;
 
     case 1:
@@ -139,7 +140,8 @@ void PlayerUpdate(GameData *gameData, const Inputs *in)
 
 void PlayerDraw(Player *player)
 {
-    if (player->invincibilityTimer > 0.0f && ((int)(GetTime()*10.0)) & 1) {
+    if (player->invincibilityTimer > 0.0f && ((int)(GetTime() * 10.0)) & 1)
+    {
         return;
     }
 
@@ -167,18 +169,42 @@ void PlayerDraw(Player *player)
     switch (player->state)
     {
     case PlayerState::Neutral:
+
         DrawRectangle((int)(player->position.x - ((player->width) >> 1)), (int)(player->position.y - ((player->height) >> 1)), (int)player->width, (int)player->height, GREEN);
+        if (dir > 0 && dir < 4)
+        {
+            WeaponDraw(player->weapon, player->position, dir, 0, WeaponState::Idle);
+        }
         DrawCentre(&player->sheets[0], dir, 0, player->position);
-        /* code */
+        if (dir <= 0 || dir >= 4)
+        {
+            WeaponDraw(player->weapon, player->position, dir, 0, WeaponState::Idle);
+        }
         break;
     case PlayerState::Attack:
         DrawRectangle((int)(player->position.x - ((player->width) >> 1)), (int)(player->position.y - ((player->height) >> 1)), (int)player->width, (int)player->height, ORANGE);
+        if (dir > 2 && dir < 6)
+        {
+            WeaponDraw(player->weapon, player->position, dir, player->attack.currentFrame, WeaponState::Idle);
+        }
         DrawCentre(&player->sheets[0], dir, 0, player->position);
         AttackDebugDraw(&player->attack, player->position, player->direction);
+        if (dir <= 2 || dir >= 6)
+        {
+            WeaponDraw(player->weapon, player->position, dir, player->attack.currentFrame, WeaponState::Idle);
+        }
         break;
     case PlayerState::Stunned:
         DrawRectangle((int)(player->position.x - ((player->width) >> 1)), (int)(player->position.y - ((player->height) >> 1)), (int)player->width, (int)player->height, RED);
+        if (dir > 0 && dir < 4)
+        {
+            WeaponDraw(player->weapon, player->position, dir, 0, WeaponState::Idle);
+        }
         DrawCentre(&player->sheets[0], dir, 0, player->position);
+        if (dir <= 0 || dir >= 4)
+        {
+            WeaponDraw(player->weapon, player->position, dir, 0, WeaponState::Idle);
+        }
         break;
     case PlayerState::Dead:
         DrawRectangle((int)(player->position.x - ((player->width) >> 1)), (int)(player->position.y - ((player->height) >> 1)), (int)player->width, (int)player->height, DARKBLUE);
@@ -203,6 +229,8 @@ Player CreatePlayer(Vector2 spawnPos)
     player.height = 16;
     player.invincibilityDuration = 2.0f;
     player.invincibilityTimer = 0;
+
+    player.weapon[0] = CreateWeapon(WeaponPrefabs::Purju);
 
     return player;
 }

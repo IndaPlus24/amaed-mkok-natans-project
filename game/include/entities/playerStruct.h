@@ -6,8 +6,10 @@
 
 #include "spriteSheet.h"
 #include "attackStruct.h"
+#include "weaponsStruct.h"
 
 #define PLAYER_SPRITE_SHEETS 1
+#define PLAYER_WEAPON_COUNT 1
 
 enum class PlayerState {
     Neutral,
@@ -30,6 +32,7 @@ typedef struct Player
     int width;              // Collision width
     int height;             // Collision height
     Attack attack;
+    Weapon weapon[PLAYER_WEAPON_COUNT];
     float invincibilityTimer;
     float invincibilityDuration;
     SpriteSheet sheets[PLAYER_SPRITE_SHEETS];

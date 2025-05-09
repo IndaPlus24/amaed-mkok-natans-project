@@ -1,3 +1,6 @@
+#ifndef SPRITE_SHEET_H
+#define SPRITE_SHEET_H
+
 #include <raylib.h>
 
 /// @brief This thing makes it easy to draw a specific section of a texture representing an animation. The standard is rows are different directions, columns are different frames
@@ -36,3 +39,5 @@ void Draw(const SpriteSheet *sheet, int direction, int frame, Vector2 pos);
 /// @param x
 /// @param y
 void DrawCentre(const SpriteSheet *sheet, int direction, int frame, Vector2 pos);
+
+#endif
