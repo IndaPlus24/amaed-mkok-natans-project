@@ -23,8 +23,8 @@ void InitGM(dataGM initdata)
     gameData.player.sheets[0] = LoadSpriteSheet("assets/sprites/n0llan.png", 8, 1);
 
     gameData.map = CreateMap(3,6,50,30,1,&gameData);
-    gameData.currentRoom = &gameData.map.rooms[1];
-    gameData.enemies = gameData.map.enemies[1];
+    gameData.currentRoom = &gameData.map.rooms[16];
+    gameData.enemies = gameData.map.enemies[16];
     printf("Current room: %d\n", gameData.currentRoom );
     
     gameData.projectiles.count = 0;
@@ -74,7 +74,8 @@ GameState RunGM()
     }
 
     DrawText("Test Room.", 0, 0, 20, WHITE);
-    
+    //draws the framerate
+    DrawText(TextFormat("FPS: %i", GetFPS()), 0, 40, 20, WHITE);
 
     EndDrawing();
 

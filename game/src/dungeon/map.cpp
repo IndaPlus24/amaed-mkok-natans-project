@@ -83,10 +83,11 @@ Map CreateMap(int floors, int roomsPerFloor, int width, int height, int floorSwi
             }
             previousDoor = &map.rooms[i * roomsPerFloor + j].doors[1];
             
-            Vector2 enemyPos[10 + (i * roomsPerFloor + j) * 10];
-            EnemyType enemyTypes[10 + (i * roomsPerFloor + j) * 10];
-            EnemyBehavior enemyBehaviors[10 + (i * roomsPerFloor + j) * 10];
-            for (int k = 0; k < 10 + (i * roomsPerFloor + j) * 10 ; k++)
+            int maxEnemies = 10 + (i * roomsPerFloor + j) * 10;
+            Vector2 enemyPos[maxEnemies];
+            EnemyType enemyTypes[maxEnemies];
+            EnemyBehavior enemyBehaviors[maxEnemies];
+            for (int k = 0; k < maxEnemies; k++)
             {
                 while (true)
                 {
@@ -102,7 +103,7 @@ Map CreateMap(int floors, int roomsPerFloor, int width, int height, int floorSwi
                 enemyTypes[k] = (EnemyType)(1 + (rand() % 2));
                 enemyBehaviors[k] = BEHAVIOR_RUSH;
             }
-            map.enemies[i * roomsPerFloor + j] = CreateEnemies(CreateEnemySeeder(10 + (i * roomsPerFloor + j) * 10 , enemyPos, enemyTypes, enemyBehaviors));
+            map.enemies[i * roomsPerFloor + j] = CreateEnemies(CreateEnemySeeder(maxEnemies, enemyPos, enemyTypes, enemyBehaviors));
             printf("Enemies created for room %d on floor %d\n", i * roomsPerFloor + j, i);
         }
     }
